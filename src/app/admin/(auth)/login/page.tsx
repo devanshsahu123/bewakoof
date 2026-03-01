@@ -34,7 +34,7 @@ export default function AdminLoginPage() {
         {/* Logo */}
         <div className="mb-8 flex items-center gap-2">
           <span className="text-xl">⚡</span>
-          <span className="flex-1 text-lg font-black text-white tracking-tight">Bewakoof</span>
+          <span className="flex-1 text-lg font-black text-white tracking-tight">{process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}</span>
           <span className="rounded-full bg-yellow-400/15 px-2 py-0.5
                            text-[0.6rem] font-bold uppercase tracking-widest text-yellow-400">
             Admin
@@ -51,7 +51,7 @@ export default function AdminLoginPage() {
             <input
               id="email" type="email" required
               value={email} onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@bewakoof.com" autoComplete="email"
+              placeholder={`admin@${(process.env.NEXT_PUBLIC_APP_NAME || "siyapaa").toLowerCase()}.com`} autoComplete="email"
               className="w-full rounded-lg border border-white/10 bg-white/[0.06]
                          px-4 py-3 text-white text-sm outline-none
                          placeholder:text-white/25

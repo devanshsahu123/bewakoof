@@ -18,7 +18,7 @@ const DEMO_IMAGE = "https://images.bewakoof.com/uploads/grid/app/Desktop-T-shirt
 export const denimProducts: Product[] = [
     {
         id: "denim-1",
-        brand: "Bewakoof®",
+        brand: `${process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}®`,
         name: "Men's Blue Washed Super Baggy Fit Distressed Jeans",
         price: 1499,
         mrp: 3299,
@@ -30,7 +30,7 @@ export const denimProducts: Product[] = [
     },
     {
         id: "denim-2",
-        brand: "Bewakoof®",
+        brand: `${process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}®`,
         name: "Men's Grey Baggy Fit Washed Cargo Mid-Rise Jeans",
         price: 1499,
         mrp: 4099,
@@ -42,7 +42,7 @@ export const denimProducts: Product[] = [
     },
     {
         id: "denim-3",
-        brand: "Bewakoof®",
+        brand: `${process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}®`,
         name: "Men's Brown Super Baggy Fit Mid-Rise Jeans",
         price: 1499,
         mrp: 3399,
@@ -54,7 +54,7 @@ export const denimProducts: Product[] = [
     },
     {
         id: "denim-4",
-        brand: "Bewakoof®",
+        brand: `${process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}®`,
         name: "Men's Brown Washed Super Baggy Fit Mid-Rise Jeans",
         price: 1499,
         mrp: 3499,
@@ -66,7 +66,7 @@ export const denimProducts: Product[] = [
     },
     {
         id: "denim-5",
-        brand: "Bewakoof®",
+        brand: `${process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}®`,
         name: "Men's Beige Super Baggy Fit Mid-Rise Jeans",
         price: 1499,
         mrp: 3399,
@@ -78,7 +78,7 @@ export const denimProducts: Product[] = [
     },
     {
         id: "denim-6",
-        brand: "Bewakoof®",
+        brand: `${process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}®`,
         name: "Men's Black Super Baggy Fit Distressed Mid-Rise Jeans",
         price: 1499,
         mrp: 3299,
@@ -90,7 +90,7 @@ export const denimProducts: Product[] = [
     },
     {
         id: "denim-7",
-        brand: "Bewakoof®",
+        brand: `${process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}®`,
         name: "Men's Indigo Super Baggy Fit Washed Mid-Rise Jeans",
         price: 1499,
         mrp: 3499,

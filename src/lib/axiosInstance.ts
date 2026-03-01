@@ -13,7 +13,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
     (config) => {
         if (typeof window !== "undefined") {
-            const token = localStorage.getItem("bewakoof_token");
+            const token = localStorage.getItem("web_token");
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`;
             }
@@ -29,7 +29,7 @@ axiosInstance.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401) {
             if (typeof window !== "undefined") {
-                localStorage.removeItem("bewakoof_token");
+                localStorage.removeItem("web_token");
                 window.location.href = "/admin/login";
             }
         }

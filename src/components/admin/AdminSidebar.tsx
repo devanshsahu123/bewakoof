@@ -16,7 +16,7 @@ export default function AdminSidebar() {
       {/* Logo */}
       <div className="flex items-center gap-2 px-5 py-5 border-b border-white/[0.06]">
         <span className="text-xl">⚡</span>
-        <span className="flex-1 text-base font-black text-white tracking-tight">bewakoof</span>
+        <span className="flex-1 text-base font-black text-white tracking-tight">{process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}</span>
         <span className="text-[0.6rem] font-bold uppercase tracking-widest px-1.5 py-0.5
                          rounded-full bg-yellow-400/15 text-yellow-400">
           Admin

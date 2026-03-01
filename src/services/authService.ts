@@ -8,7 +8,7 @@ export const authService = {
             password,
         });
         if (data.token) {
-            localStorage.setItem("bewakoof_token", data.token);
+            localStorage.setItem("web_token", data.token);
         }
         return data;
     },
@@ -17,7 +17,7 @@ export const authService = {
         try {
             await axiosInstance.post("/auth/logout");
         } finally {
-            localStorage.removeItem("bewakoof_token");
+            localStorage.removeItem("web_token");
         }
     },
 

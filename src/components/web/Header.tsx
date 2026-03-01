@@ -91,7 +91,8 @@ export default function Header() {
               {/* Logo */}
               <Link href="/" className="flex items-center shrink-0">
                 <span className="text-[clamp(16px,4.5vw,24px)] font-[900] tracking-widest text-black uppercase sm:translate-y-[2px] mt-0.5 sm:mt-0">
-                  BEWAKOOF<span className="text-[clamp(7px,2vw,12px)] font-bold align-top ml-[1px]">®</span>
+                  {process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}
+                  <span className="text-[clamp(7px,2vw,12px)] font-bold align-top ml-[1px]">®</span>
                 </span>
               </Link>
 

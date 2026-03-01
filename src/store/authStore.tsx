@@ -26,17 +26,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>(() => {
     if (typeof window === "undefined")
       return { user: null, token: null, isAuthenticated: false };
-    const token = localStorage.getItem("bewakoof_token");
+    const token = localStorage.getItem("web_token");
     return { user: null, token, isAuthenticated: !!token };
   });
 
   const setAuth = useCallback((user: User, token: string) => {
-    localStorage.setItem("bewakoof_token", token);
+    localStorage.setItem("web_token", token);
     setState({ user, token, isAuthenticated: true });
   }, []);
 
   const clearAuth = useCallback(() => {
-    localStorage.removeItem("bewakoof_token");
+    localStorage.removeItem("web_token");
     setState({ user: null, token: null, isAuthenticated: false });
   }, []);
 

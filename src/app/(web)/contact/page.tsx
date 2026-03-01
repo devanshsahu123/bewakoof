@@ -12,8 +12,8 @@ export default function ContactPage() {
       </h1>
       <p style={{ color: "var(--color-text-secondary)", maxWidth: 640, lineHeight: 1.8 }}>
         Have a question, feedback, or want to collaborate? Reach us at{" "}
-        <a href="mailto:support@bewakoof.com" style={{ color: "var(--color-primary)", fontWeight: 600 }}>
-          support@bewakoof.com
+        <a href={`mailto:support@${(process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa").toLowerCase()}.com`} style={{ color: "var(--color-primary)", fontWeight: 600 }}>
+          support@{(process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa").toLowerCase()}.com
         </a>
       </p>
     </section>

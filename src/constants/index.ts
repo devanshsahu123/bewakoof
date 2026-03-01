@@ -26,9 +26,9 @@ export const ROUTES = {
 
 /* ---- Local-storage Keys ---- */
 export const STORAGE_KEYS = {
-    AUTH_TOKEN: "bewakoof_token",
+    AUTH_TOKEN: "web_token",
     CART: "bewakoof_cart",
-    THEME: "bewakoof_theme",
+    THEME: "web_theme",
 } as const;
 
 /* ---- Pagination ---- */

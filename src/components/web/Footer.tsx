@@ -19,7 +19,7 @@ export default function Footer() {
           {/* Brand Info */}
           <div className="w-full lg:max-w-xs xl:max-w-sm">
             <span className="block text-2xl md:text-3xl font-[900] tracking-wide mb-4 text-[#fdd835]">
-              BEWAKOOF<sup className="text-sm">®</sup>
+              {process.env.NEXT_PUBLIC_APP_NAME || "BEWAKOOF"}<sup className="text-sm">®</sup>
             </span>
             <p className="text-sm text-gray-400 leading-relaxed">
               India&apos;s leading youth fashion brand — offering quirky, customized, and trendy apparel that&apos;s boldly you.
@@ -72,7 +72,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-gray-800 text-xs text-gray-500 tracking-wide text-center sm:text-left">
-          <p>© {year} Bewakoof Brands Pvt. Ltd. All rights reserved.</p>
+          <p>© {year} {process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"} Brands Pvt. Ltd. All rights reserved.</p>
           <p className="font-semibold text-gray-400">100% SECURE PAYMENT</p>
         </div>
 

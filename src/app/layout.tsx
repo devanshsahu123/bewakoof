@@ -12,12 +12,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa";
+
 export const metadata: Metadata = {
   title: {
-    default: "Bewakoof",
-    template: "%s | Bewakoof",
+    default: APP_NAME,
+    template: `%s | ${APP_NAME}`,
   },
-  description: "India's coolest fashion destination – Bewakoof",
+  description: `India's coolest fashion destination – ${APP_NAME}`,
 };
 
 export default function RootLayout({
