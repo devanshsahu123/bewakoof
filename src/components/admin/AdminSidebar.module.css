@@ -1,0 +1,95 @@
+/* Admin Sidebar */
+.sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--color-admin-surface);
+    border-right: 1px solid rgba(255, 215, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+/* Logo */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.5rem 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.logoIcon {
+    font-size: 1.25rem;
+}
+
+.logoText {
+    font-size: 1rem;
+    font-weight: 900;
+    color: #fff;
+    flex: 1;
+}
+
+.badge {
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 0.15rem 0.4rem;
+    background: rgba(255, 215, 0, 0.15);
+    color: var(--color-admin-accent);
+    border-radius: var(--radius-full);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* Nav */
+.nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1rem 0.75rem;
+}
+
+.navItem {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.7rem 1rem;
+    border-radius: var(--radius-md);
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background var(--transition), color var(--transition);
+}
+
+.navItem:hover {
+    background: rgba(255, 215, 0, 0.08);
+    color: var(--color-admin-accent);
+}
+
+.navIcon {
+    font-size: 1.1rem;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.navLabel {
+    flex: 1;
+}
+
+/* Sidebar Footer */
+.sidebarFooter {
+    padding: 1rem 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.backLink {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.35);
+    transition: color var(--transition);
+}
+
+.backLink:hover {
+    color: #fff;
+}
