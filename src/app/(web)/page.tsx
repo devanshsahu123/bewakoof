@@ -1,14 +1,16 @@
-const categoryData = [
-  { name: "Men",         href: "/shop/men",         emoji: "👕" },
-  { name: "Women",       href: "/shop/women",        emoji: "👗" },
-  { name: "Kids",        href: "/shop/kids",         emoji: "🧒" },
-  { name: "Accessories", href: "/shop/accessories",  emoji: "🎒" },
-];
+import ProductSection from "@/components/web/home/ProductSection";
+import { denimProducts } from "@/data/products";
 
 export default function HomePage() {
   return (
     <>
-    
+      {/* Denim Verse Section */}
+      <ProductSection
+        title="Denim Verse"
+        products={denimProducts}
+        seeAllHref="/shop/men?category=jeans"
+        bgColor="#fdf9ec"
+      />
     </>
   );
 }
