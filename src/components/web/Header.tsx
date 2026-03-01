@@ -85,13 +85,13 @@ export default function Header() {
                 className="lg:hidden p-1 -ml-1 text-black hover:text-[#fdd835] transition-colors"
                 aria-label="Menu"
               >
-                <HiOutlineBars3 size={28} />
+                <HiOutlineBars3 className="w-[24px] h-[24px] sm:w-[28px] sm:h-[28px]" />
               </button>
 
               {/* Logo */}
               <Link href="/" className="flex items-center shrink-0">
-                <span className="text-[20px] md:text-[24px] font-[900] tracking-wide text-black uppercase translate-y-[2px]">
-                  BEWAKOOF<span className="text-[12px] font-bold align-top ml-[1px]">®</span>
+                <span className="text-[clamp(16px,4.5vw,24px)] font-[900] tracking-widest text-black uppercase sm:translate-y-[2px] mt-0.5 sm:mt-0">
+                  BEWAKOOF<span className="text-[clamp(7px,2vw,12px)] font-bold align-top ml-[1px]">®</span>
                 </span>
               </Link>
 
@@ -132,7 +132,7 @@ export default function Header() {
               <div className="flex items-center gap-3 sm:gap-4 md:gap-5 lg:gap-6">
                 {/* Mobile Search Icon (only shows when search bar is hidden) */}
                  <button className="lg:hidden text-black p-1">
-                   <HiOutlineMagnifyingGlass size={22} className="stroke-[1.5]" />
+                   <HiOutlineMagnifyingGlass className="w-[20px] h-[20px] sm:w-[22px] sm:h-[22px] stroke-[1.5]" />
                  </button>
 
                 <Link href="/account" className="hidden lg:flex text-black text-[13px] font-[500] hover:text-[#fdd835] transition-colors items-center">
@@ -140,13 +140,13 @@ export default function Header() {
                 </Link>
 
                 <Link href="/wishlist" className="text-black hover:text-[#fdd835] transition-colors">
-                  <HiOutlineHeart size={24} className="stroke-[1.5]" />
+                  <HiOutlineHeart className="w-[20px] h-[20px] sm:w-[24px] sm:h-[24px] stroke-[1.5]" />
                 </Link>
 
                 <Link href="/cart" className="text-black hover:text-[#fdd835] transition-colors relative">
-                  <HiOutlineShoppingBag size={24} className="stroke-[1.5]" />
+                  <HiOutlineShoppingBag className="w-[20px] h-[20px] sm:w-[24px] sm:h-[24px] stroke-[1.5]" />
                   {/* Cart Badge Placeholder */}
-                  <span className="absolute -top-1.5 -right-2 bg-[#fdd835] text-black text-[10px] font-bold rounded-full h-[18px] min-w-[18px] flex items-center justify-center px-1">
+                  <span className="absolute -top-1.5 -right-2 bg-[#fdd835] text-black text-[9px] sm:text-[10px] font-bold rounded-full h-[16px] min-w-[16px] sm:h-[18px] sm:min-w-[18px] flex items-center justify-center px-1">
                     0
                   </span>
                 </Link>
