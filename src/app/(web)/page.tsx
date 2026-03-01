@@ -1,10 +1,14 @@
+import HeroBanner from "@/components/web/home/HeroBanner";
 import ProductSection from "@/components/web/home/ProductSection";
 import { denimProducts } from "@/data/products";
 
 export default function HomePage() {
   return (
     <>
-      {/* Denim Verse Section */}
+      {/* Auto-scroll Hero Banner */}
+      <HeroBanner />
+
+      {/* Denim Verse Product Section */}
       <ProductSection
         title="Denim Verse"
         products={denimProducts}
