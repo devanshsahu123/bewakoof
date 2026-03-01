@@ -29,7 +29,7 @@ export default function ProductCarousel({ products }: { products: Product[] }) {
     };
   }, [check]);
 
-  const scroll = (dir: "left" | "right") => {
+  const scrollBy = (dir: "left" | "right") => {
     const el = scrollRef.current;
     if (!el) return;
     el.scrollBy({
@@ -38,57 +38,41 @@ export default function ProductCarousel({ products }: { products: Product[] }) {
     });
   };
 
-  return (
-    /* Outer wrapper — overflow visible so arrows aren't clipped */
-    <div className="relative" style={{ overflow: "visible" }}>
+  const arrowBase =
+    "absolute z-30 top-[40%] -translate-y-1/2 w-9 h-9 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center text-gray-700 hover:bg-gray-50 hover:shadow-lg transition-all duration-200";
 
-      {/* ── Left Arrow ── */}
+  return (
+    <div className="relative" style={{ overflow: "visible" }}>
+      {/* Left arrow */}
       <button
         type="button"
-        onClick={() => scroll("left")}
+        onClick={() => scrollBy("left")}
         aria-label="Previous"
+        className={`${arrowBase} left-[-20px] ${canLeft ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         style={{ cursor: "pointer" }}
-        className={`
-          absolute left-[-18px] top-[38%] -translate-y-1/2 z-30
-          w-9 h-9 rounded-full bg-white border border-gray-200 shadow-md
-          flex items-center justify-center text-gray-700
-          hover:bg-gray-50 hover:text-black hover:shadow-lg
-          transition-all duration-200
-          ${canLeft ? "opacity-100" : "opacity-0 pointer-events-none"}
-        `}
       >
         <HiChevronLeft size={20} />
       </button>
 
-      {/* ── Right Arrow ── */}
+      {/* Right arrow */}
       <button
         type="button"
-        onClick={() => scroll("right")}
+        onClick={() => scrollBy("right")}
         aria-label="Next"
+        className={`${arrowBase} right-[-20px] ${canRight ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         style={{ cursor: "pointer" }}
-        className={`
-          absolute right-[-18px] top-[38%] -translate-y-1/2 z-30
-          w-9 h-9 rounded-full bg-white border border-gray-200 shadow-md
-          flex items-center justify-center text-gray-700
-          hover:bg-gray-50 hover:text-black hover:shadow-lg
-          transition-all duration-200
-          ${canRight ? "opacity-100" : "opacity-0 pointer-events-none"}
-        `}
       >
         <HiChevronRight size={20} />
       </button>
 
-      {/* ── Scroll Track ── */}
+      {/* Scroll track */}
       <div
         ref={scrollRef}
-        className="flex gap-3 sm:gap-4 overflow-x-auto pb-2"
-        style={{
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-        }}
+        className="flex gap-3 overflow-x-auto scroll-smooth pb-1"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" as React.CSSProperties["msOverflowStyle"] }}
       >
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
+        {products.map((p) => (
+          <ProductCard key={p.id} product={p} />
         ))}
       </div>
     </div>
