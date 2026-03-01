@@ -38,8 +38,7 @@ export default function ProductCarousel({ products }: { products: Product[] }) {
     });
   };
 
-  const arrowBase =
-    "absolute z-30 top-[40%] -translate-y-1/2 w-9 h-9 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center text-gray-700 hover:bg-gray-50 hover:shadow-lg transition-all duration-200";
+  const arrowBase = "absolute z-30 top-[40%] -translate-y-1/2 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center text-gray-700 hover:bg-gray-50 hover:shadow-lg transition-all duration-200";
 
   return (
     <div className="relative" style={{ overflow: "visible" }}>
@@ -48,10 +47,10 @@ export default function ProductCarousel({ products }: { products: Product[] }) {
         type="button"
         onClick={() => scrollBy("left")}
         aria-label="Previous"
-        className={`${arrowBase} left-[-20px] ${canLeft ? "opacity-100" : "opacity-0 pointer-events-none"}`}
-        style={{ cursor: "pointer" }}
+        className={`${arrowBase} ${canLeft ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        style={{ cursor: "pointer", width: "clamp(28px, 6vw, 40px)", height: "clamp(28px, 6vw, 40px)", left: "clamp(-15px, -3vw, -20px)" }}
       >
-        <HiChevronLeft size={20} />
+        <HiChevronLeft style={{ width: "clamp(16px, 4vw, 24px)", height: "clamp(16px, 4vw, 24px)" }} />
       </button>
 
       {/* Right arrow */}
@@ -59,17 +58,17 @@ export default function ProductCarousel({ products }: { products: Product[] }) {
         type="button"
         onClick={() => scrollBy("right")}
         aria-label="Next"
-        className={`${arrowBase} right-[-20px] ${canRight ? "opacity-100" : "opacity-0 pointer-events-none"}`}
-        style={{ cursor: "pointer" }}
+        className={`${arrowBase} ${canRight ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        style={{ cursor: "pointer", width: "clamp(28px, 6vw, 40px)", height: "clamp(28px, 6vw, 40px)", right: "clamp(-15px, -3vw, -20px)" }}
       >
-        <HiChevronRight size={20} />
+        <HiChevronRight style={{ width: "clamp(16px, 4vw, 24px)", height: "clamp(16px, 4vw, 24px)" }} />
       </button>
 
       {/* Scroll track */}
       <div
         ref={scrollRef}
-        className="flex gap-3 overflow-x-auto scroll-smooth pb-1"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" as React.CSSProperties["msOverflowStyle"] }}
+        className="flex overflow-x-auto scroll-smooth pb-1"
+        style={{ gap: "clamp(8px, 2vw, 16px)", scrollbarWidth: "none", msOverflowStyle: "none" as React.CSSProperties["msOverflowStyle"] }}
       >
         {products.map((p) => (
           <ProductCard key={p.id} product={p} />

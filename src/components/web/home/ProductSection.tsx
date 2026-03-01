@@ -16,8 +16,8 @@ export default function ProductSection({
   bgColor = "#ffffff",
 }: ProductSectionProps) {
   return (
-    <section className="w-full py-10 md:py-14" style={{ backgroundColor: bgColor }}>
-      <div className="mx-auto max-w-[1400px] px-5 sm:px-8">
+    <section className="w-full py-[clamp(2rem,5vw,4rem)]" style={{ backgroundColor: bgColor }}>
+      <div className="mx-auto max-w-[1440px] px-2 sm:px-4 lg:px-6">
 
         {/* ── Section Header ── */}
         <div className="flex items-center justify-center gap-4 mb-2">
@@ -50,8 +50,8 @@ export default function ProductSection({
           </div>
         )}
 
-        {/* Carousel — px-5 gives room for the ±20px arrow buttons */}
-        <div className="px-5">
+        {/* Carousel */}
+        <div className="w-full relative">
           <ProductCarousel products={products} />
         </div>
 
