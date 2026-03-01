@@ -25,7 +25,8 @@ export default function ProductSection({
           <span className="hidden sm:block flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-gray-300" />
 
           {/* Title */}
-          <h2 className="text-[20px] sm:text-[24px] md:text-[28px] font-[900] tracking-[0.2em] text-black uppercase shrink-0 text-center leading-none">
+          <h2 className="font-[900] text-black uppercase shrink-0 text-center leading-none"
+              style={{ fontSize: "clamp(18px, 4vw, 28px)", letterSpacing: "clamp(0.1em, 0.4vw, 0.2em)" }}>
             {title}
           </h2>
 
@@ -34,16 +35,17 @@ export default function ProductSection({
         </div>
 
         {/* Yellow accent bar */}
-        <div className="flex justify-center mb-6">
-          <div className="w-12 h-[3px] bg-[#fdd835] rounded-full" />
+        <div className="flex justify-center mb-[clamp(16px,3vw,24px)]">
+          <div className="bg-[#fdd835] rounded-full" style={{ width: "clamp(32px, 5vw, 48px)", height: "3px" }} />
         </div>
 
         {/* See All */}
         {seeAllHref && (
-          <div className="flex justify-end mb-4">
+          <div className="flex justify-end mb-[clamp(8px,2vw,16px)]">
             <Link
               href={seeAllHref}
-              className="text-[12px] font-[700] uppercase tracking-widest text-gray-500 hover:text-black border-b border-gray-400 hover:border-black transition-colors pb-0.5"
+              className="font-[700] uppercase text-gray-500 hover:text-black border-b border-gray-400 hover:border-black transition-colors pb-0.5"
+              style={{ fontSize: "clamp(10px, 1.5vw, 13px)", letterSpacing: "0.1em" }}
             >
               See All →
             </Link>
