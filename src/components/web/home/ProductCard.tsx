@@ -86,7 +86,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
         {/* Name — fixed 2-line height so all cards align */}
         <p className="text-[11px] sm:text-[12px] text-gray-500 leading-snug line-clamp-2"
-           style={{ minHeight: "32px" }}>
+          style={{ minHeight: "32px" }}>
           {product.name}
         </p>
 

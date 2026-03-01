@@ -84,7 +84,6 @@ export default function ProductCarousel({ products }: { products: Product[] }) {
         className="flex gap-3 sm:gap-4 overflow-x-auto pb-2"
         style={{
           scrollbarWidth: "none",
-          // @ts-expect-error: IE-only property
           msOverflowStyle: "none",
         }}
       >
