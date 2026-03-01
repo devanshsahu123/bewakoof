@@ -39,16 +39,16 @@ export default function ProductCard({ product }: { product: Product }) {
         )}
 
         {/* Top-right: Discount % */}
-        <span className="absolute top-2 right-2 z-10 bg-[#fdd835] text-black font-[900] rounded-sm leading-tight"
+        {/* <span className="absolute top-2 right-2 z-10 bg-[#fdd835] text-black font-[900] rounded-sm leading-tight"
           style={{ fontSize: "clamp(7px, 2.2vw, 10px)", padding: "clamp(2px,0.6vw,4px) clamp(3px,1.2vw,6px)" }}>
           {discount}%<br />OFF
-        </span>
+        </span> */}
 
         {/* Bottom gradient overlay */}
         <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/60 to-transparent z-10 pointer-events-none rounded-b-lg" />
 
         {/* Rating chip — bottom-left */}
-        <div className="absolute bottom-2 left-2 z-20 flex items-center gap-1">
+        {/* <div className="absolute bottom-2 left-2 z-20 flex items-center gap-1">
           <HiStar className="text-[#fdd835]" style={{ width: "clamp(9px, 2.5vw, 12px)", height: "clamp(9px, 2.5vw, 12px)" }} />
           <span className="text-white font-[700] leading-none" style={{ fontSize: "clamp(9px, 2.5vw, 11px)" }}>
             {product.rating}
@@ -60,20 +60,8 @@ export default function ProductCard({ product }: { product: Product }) {
                 : product.ratingCount})
             </span>
           )}
-        </div>
+        </div> */}
 
-        {/* Wishlist — bottom-right, inside the image */}
-        <button
-          type="button"
-          onClick={() => setWishlisted((p) => !p)}
-          aria-label="Wishlist"
-          className="absolute bottom-2 right-2 z-20 bg-white rounded-full shadow flex items-center justify-center transition-transform hover:scale-110"
-          style={{ cursor: "pointer", width: "clamp(22px, 6vw, 28px)", height: "clamp(22px, 6vw, 28px)" }}
-        >
-          {wishlisted
-            ? <HiHeart className="text-red-500" style={{ width: "clamp(11px, 3.5vw, 14px)", height: "clamp(11px, 3.5vw, 14px)" }} />
-            : <HiOutlineHeart className="text-gray-500" style={{ width: "clamp(11px, 3.5vw, 14px)", height: "clamp(11px, 3.5vw, 14px)" }} />}
-        </button>
       </div>
 
       {/* ── Info Block ── */}
@@ -88,11 +76,25 @@ export default function ProductCard({ product }: { product: Product }) {
           {product.name}
         </p>
 
-        {/* Price row */}
-        <div className="flex items-baseline gap-1.5 flex-wrap mt-[1px]">
-          <span className="font-[900] text-black leading-none" style={{ fontSize: "clamp(11px, 3.2vw, 14px)" }}>₹{product.price}</span>
-          <span className="text-gray-400 line-through leading-none" style={{ fontSize: "clamp(9px, 2.3vw, 11px)" }}>₹{product.mrp}</span>
-          <span className="font-[700] text-green-700 leading-none" style={{ fontSize: "clamp(8px, 2.2vw, 10px)" }}>{discount}% off</span>
+        {/* Price row + Wishlist */}
+        <div className="flex items-center justify-between mt-[1px]">
+          <div className="flex items-baseline gap-1.5 flex-wrap">
+            <span className="font-[900] text-black leading-none" style={{ fontSize: "clamp(11px, 3.2vw, 14px)" }}>₹{product.price}</span>
+            <span className="text-gray-400 line-through leading-none" style={{ fontSize: "clamp(9px, 2.3vw, 11px)" }}>₹{product.mrp}</span>
+            <span className="font-[700] text-green-700 leading-none" style={{ fontSize: "clamp(8px, 2.2vw, 10px)" }}>{discount}% off</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setWishlisted((p) => !p)}
+            aria-label="Wishlist"
+            className="flex items-center justify-center transition-transform hover:scale-110"
+            style={{ cursor: "pointer", padding: "2px" }}
+          >
+            {wishlisted
+              ? <HiHeart className="text-red-500" style={{ width: "clamp(14px, 4vw, 18px)", height: "clamp(14px, 4vw, 18px)" }} />
+              : <HiOutlineHeart className="text-gray-400 hover:text-gray-600" style={{ width: "clamp(14px, 4vw, 18px)", height: "clamp(14px, 4vw, 18px)" }} />}
+          </button>
         </div>
       </div>
     </div>
