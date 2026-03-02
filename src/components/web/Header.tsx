@@ -11,6 +11,7 @@ import {
   HiOutlineBars3,
   HiXMark
 } from "react-icons/hi2";
+import { useCart } from "@/hooks/useCart";
 
 const mainNavLinks = [
   { label: "MEN", href: "/shop/men" },
@@ -23,6 +24,7 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const router = useRouter();
+  const { cartCount } = useCart();
 
   // Handle scroll for sticky header shadow
   useEffect(() => {
@@ -146,10 +148,11 @@ export default function Header() {
 
                 <Link href="/cart" className="text-black hover:text-[#fdd835] transition-colors relative">
                   <HiOutlineShoppingBag className="w-[20px] h-[20px] sm:w-[24px] sm:h-[24px] stroke-[1.5]" />
-                  {/* Cart Badge Placeholder */}
-                  <span className="absolute -top-1.5 -right-2 bg-[#fdd835] text-black text-[9px] sm:text-[10px] font-bold rounded-full h-[16px] min-w-[16px] sm:h-[18px] sm:min-w-[18px] flex items-center justify-center px-1">
-                    0
-                  </span>
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1.5 -right-2 bg-[#fdd835] text-black text-[9px] sm:text-[10px] font-bold rounded-full h-[16px] min-w-[16px] sm:h-[18px] sm:min-w-[18px] flex items-center justify-center px-1 transition-all duration-300">
+                      {cartCount > 99 ? "99+" : cartCount}
+                    </span>
+                  )}
                 </Link>
               </div>
             </div>

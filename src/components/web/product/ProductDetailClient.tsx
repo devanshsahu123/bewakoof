@@ -17,6 +17,7 @@ import {
 import type { ProductDetail } from "@/data/products";
 import ProductCarousel from "@/components/web/home/ProductCarousel";
 import type { Product } from "@/data/products";
+import { useCart } from "@/hooks/useCart";
 
 function getDiscount(price: number, mrp: number) {
   return Math.round(((mrp - price) / mrp) * 100);
@@ -58,7 +59,6 @@ function AccordionItem({
   defaultOpen?: boolean;
 }) {
   const [open, setOpen] = useState(defaultOpen);
-
   return (
     <div className="border-t border-gray-100 last:border-b last:border-gray-100">
       <button
@@ -80,9 +80,7 @@ function AccordionItem({
         </span>
       </button>
       <div
-        className={`overflow-hidden transition-all duration-300 ease-in-out ${
-          open ? "max-h-[400px]" : "max-h-0"
-        }`}
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${open ? "max-h-[400px]" : "max-h-0"}`}
       >
         <div className="pb-4 text-[13.5px] text-gray-500 leading-relaxed">
           {children}
@@ -107,8 +105,28 @@ export default function ProductDetailClient({
   const [wishlisted, setWishlisted] = useState(false);
   const [pincode, setPincode] = useState("");
   const [activeReviewTab, setActiveReviewTab] = useState<"product" | "brand">("product");
+  const [addedToCart, setAddedToCart] = useState(false);
 
+  const { addToCart } = useCart();
   const discount = getDiscount(product.price, product.mrp);
+
+  function handleAddToCart() {
+    const size = selectedSize ?? (product.sizes.find((s) => s.stock > 0)?.label ?? "Free");
+    // derive slug from href e.g. "/product/mens-blue-baggy-jeans" → "mens-blue-baggy-jeans"
+    const slug = product.href.split("/").filter(Boolean).pop() ?? product.id;
+    addToCart({
+      id: product.id,
+      slug,
+      name: product.name,
+      brand: product.brand,
+      price: product.price,
+      mrp: product.mrp,
+      image: product.images[0],
+      size,
+    });
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 2000);
+  }
 
   return (
     <div className="bg-white min-h-screen">
@@ -149,11 +167,14 @@ export default function ProductDetailClient({
           </ol>
         </nav>
 
-        {/* ══════════════════════════════════════════════════════════
-            MAIN TWO-COLUMN LAYOUT
-            LEFT  → STICKY image gallery (stays in place while scroll)
-            RIGHT → scrolls normally (name, price, size, CTA, offers)
-        ══════════════════════════════════════════════════════════ */}
+        {/* ═══════════════════════════════════════════════════════════
+            TWO-COLUMN LAYOUT
+            LEFT  → STICKY image gallery
+            RIGHT → ALL scrollable content including Key Highlights,
+                    Accordions, and Trust Badges.
+                    The left image stays "stuck" for the whole height
+                    of the right column.
+        ═══════════════════════════════════════════════════════════ */}
         <article
           itemScope
           itemType="https://schema.org/Product"
@@ -161,22 +182,19 @@ export default function ProductDetailClient({
         >
 
           {/* ═══ LEFT — Sticky Image Gallery ═══════════════════ */}
-          <div className="w-full lg:w-[48%] xl:w-[46%] flex-shrink-0 lg:sticky lg:top-[72px] lg:self-start">
+          <div className="w-full lg:w-[46%] xl:w-[44%] flex-shrink-0 lg:sticky lg:top-[72px] lg:self-start">
 
-            {/* Mobile: stacked thumbnails + main image */}
+            {/* sm+ : vertical thumbnail strip + main image side-by-side */}
             <div className="flex gap-2 sm:gap-3">
 
-              {/* Thumbnail strip — hidden on mobile, visible on sm+ */}
-              <div className="hidden sm:flex flex-col gap-2 w-[60px] flex-shrink-0 max-h-[520px] overflow-y-auto">
+              {/* Vertical thumbnails — hidden on mobile */}
+              <div className="hidden sm:flex flex-col gap-2 w-[58px] flex-shrink-0 max-h-[560px] overflow-y-auto">
                 {product.images.map((img, i) => (
                   <button
                     key={i}
                     onClick={() => setActiveImage(i)}
                     className={`relative w-full aspect-[3/4] rounded-lg overflow-hidden flex-shrink-0 cursor-pointer transition-all duration-200 bg-gray-100 border-2
-                      ${i === activeImage
-                        ? "border-gray-900"
-                        : "border-transparent hover:border-gray-300"
-                      }`}
+                      ${i === activeImage ? "border-gray-900" : "border-transparent hover:border-gray-300"}`}
                     aria-label={`View image ${i + 1}`}
                   >
                     <Image
@@ -184,7 +202,7 @@ export default function ProductDetailClient({
                       alt={`${product.name} – view ${i + 1}`}
                       fill
                       className="object-cover object-top"
-                      sizes="60px"
+                      sizes="58px"
                       unoptimized
                     />
                   </button>
@@ -203,7 +221,7 @@ export default function ProductDetailClient({
                   alt={product.name}
                   fill
                   className="object-cover object-top transition-transform duration-500 hover:scale-105"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 55vw, 600px"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 55vw, 580px"
                   priority
                   unoptimized
                   itemProp="image"
@@ -211,7 +229,7 @@ export default function ProductDetailClient({
               </div>
             </div>
 
-            {/* Mobile thumbnail row — only on xs, below the main image */}
+            {/* Mobile horizontal thumbnail strip — xs only */}
             <div className="flex sm:hidden gap-2 mt-2 overflow-x-auto pb-1">
               {product.images.map((img, i) => (
                 <button
@@ -233,22 +251,19 @@ export default function ProductDetailClient({
             </div>
           </div>
 
-          {/* ═══ RIGHT — Product Info (scrolls normally) ════════ */}
+          {/* ═══ RIGHT — ALL product info + Key Highlights ════════
+              This column scrolls. The left image stays sticky for its
+              full height, then both scroll together naturally.
+          ═══════════════════════════════════════════════════════ */}
           <div className="w-full lg:flex-1 min-w-0">
 
             {/* Brand */}
-            <p
-              className="text-[11px] font-extrabold tracking-[0.15em] text-gray-400 uppercase mb-1"
-              itemProp="brand"
-            >
+            <p className="text-[11px] font-extrabold tracking-[0.15em] text-gray-400 uppercase mb-1" itemProp="brand">
               {product.brand}
             </p>
 
-            {/* Product Name — h1 (SEO primary heading) */}
-            <h1
-              className="text-xl sm:text-2xl font-bold text-gray-900 leading-snug mb-3"
-              itemProp="name"
-            >
+            {/* h1 — Product name */}
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-snug mb-3" itemProp="name">
               {product.name}
             </h1>
 
@@ -266,9 +281,7 @@ export default function ProductDetailClient({
                 <span className="text-[15px] text-gray-400 line-through font-normal">
                   ₹{product.mrp.toLocaleString("en-IN")}
                 </span>
-                <span className="text-sm font-extrabold text-green-700">
-                  {discount}% OFF
-                </span>
+                <span className="text-sm font-extrabold text-green-700">{discount}% OFF</span>
               </div>
               <p className="text-[11.5px] text-gray-400 mb-4">inclusive of all taxes</p>
             </div>
@@ -281,19 +294,15 @@ export default function ProductDetailClient({
               itemType="https://schema.org/AggregateRating"
             >
               <meta itemProp="ratingValue" content={String(product.rating)} />
-              {product.ratingCount && (
-                <meta itemProp="reviewCount" content={String(product.ratingCount)} />
-              )}
+              {product.ratingCount && <meta itemProp="reviewCount" content={String(product.ratingCount)} />}
               <StarRating rating={product.rating} />
               <span className="text-sm font-bold text-gray-900">{product.rating}</span>
               {product.ratingCount && (
-                <span className="text-xs text-gray-400">
-                  | {product.ratingCount.toLocaleString("en-IN")} Ratings
-                </span>
+                <span className="text-xs text-gray-400">| {product.ratingCount.toLocaleString("en-IN")} Ratings</span>
               )}
             </div>
 
-            {/* Savings Chip */}
+            {/* Savings chip */}
             {product.savingsPrice && (
               <div className="mb-3">
                 <span className="inline-flex items-center gap-1.5 bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-300 rounded-full px-3 py-1.5 text-xs font-semibold text-yellow-800">
@@ -303,7 +312,7 @@ export default function ProductDetailClient({
               </div>
             )}
 
-            {/* Fabric Badge */}
+            {/* Fabric badge */}
             {product.fabricBadge && (
               <div className="mb-4">
                 <span className="inline-flex items-center gap-1.5 bg-gray-100 border border-gray-200 rounded-full px-3 py-1 text-[11.5px] font-semibold text-gray-600">
@@ -357,9 +366,19 @@ export default function ProductDetailClient({
 
             {/* Add to Bag + Wishlist */}
             <div className="flex items-center gap-3 mb-6">
-              <button className="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-6 bg-yellow-400 hover:bg-yellow-300 text-gray-900 text-sm font-extrabold tracking-wide uppercase rounded-lg border-0 cursor-pointer transition-all duration-150 shadow-[0_4px_14px_rgba(253,216,53,0.45)] hover:shadow-[0_8px_24px_rgba(253,216,53,0.55)] hover:-translate-y-0.5 active:translate-y-0">
-                <HiOutlineShoppingBag size={20} strokeWidth={2.5} />
-                ADD TO BAG
+              <button
+                onClick={handleAddToCart}
+                className={`flex-1 flex items-center justify-center gap-2.5 py-3.5 px-6 text-sm font-extrabold tracking-wide uppercase rounded-lg border-0 cursor-pointer transition-all duration-200
+                  ${addedToCart
+                    ? "bg-green-500 text-white shadow-[0_4px_14px_rgba(34,197,94,0.45)]"
+                    : "bg-yellow-400 hover:bg-yellow-300 text-gray-900 shadow-[0_4px_14px_rgba(253,216,53,0.45)] hover:shadow-[0_8px_24px_rgba(253,216,53,0.55)] hover:-translate-y-0.5"
+                  } active:translate-y-0`}
+              >
+                {addedToCart ? (
+                  <>✓ ADDED TO BAG</>
+                ) : (
+                  <><HiOutlineShoppingBag size={20} strokeWidth={2.5} /> ADD TO BAG</>
+                )}
               </button>
               <button
                 className={`flex items-center justify-center w-[52px] h-[52px] rounded-lg border cursor-pointer transition-all duration-150 flex-shrink-0
@@ -367,34 +386,25 @@ export default function ProductDetailClient({
                 onClick={() => setWishlisted((v) => !v)}
                 aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
               >
-                {wishlisted ? (
-                  <HiHeart size={22} className="text-red-500" />
-                ) : (
-                  <HiOutlineHeart size={22} className="text-gray-500" />
-                )}
+                {wishlisted
+                  ? <HiHeart size={22} className="text-red-500" />
+                  : <HiOutlineHeart size={22} className="text-gray-500" />
+                }
               </button>
             </div>
 
             {/* Offers */}
             <section aria-label="Available offers" className="mb-5">
-              <h2 className="text-sm font-bold text-gray-900 mb-3">
-                Save extra with these offers
-              </h2>
+              <h2 className="text-sm font-bold text-gray-900 mb-3">Save extra with these offers</h2>
               <div className="flex flex-col gap-2">
                 {product.offers.map((offer, i) => (
-                  <div
-                    key={i}
-                    className="flex items-start gap-3 p-3.5 border-[1.5px] border-dashed border-gray-200 rounded-xl bg-gray-50 hover:border-yellow-400 hover:bg-yellow-50 transition-colors duration-150"
-                  >
+                  <div key={i} className="flex items-start gap-3 p-3.5 border-[1.5px] border-dashed border-gray-200 rounded-xl bg-gray-50 hover:border-yellow-400 hover:bg-yellow-50 transition-colors duration-150">
                     <span className="text-2xl leading-none mt-0.5">{offer.icon}</span>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-gray-900">{offer.title}</p>
                       <p className="text-xs text-gray-400 mt-0.5">{offer.subtitle}</p>
                     </div>
-                    <Link
-                      href={offer.href}
-                      className="text-xs font-bold text-green-700 flex items-center gap-0.5 whitespace-nowrap self-end hover:underline"
-                    >
+                    <Link href={offer.href} className="text-xs font-bold text-green-700 flex items-center gap-0.5 whitespace-nowrap self-end hover:underline">
                       View all <HiChevronRight size={12} strokeWidth={2.5} />
                     </Link>
                   </div>
@@ -403,10 +413,8 @@ export default function ProductDetailClient({
             </section>
 
             {/* Delivery checker */}
-            <section aria-label="Check delivery" className="mb-2">
-              <h2 className="text-sm font-bold text-gray-900 mb-3">
-                Check for Delivery Details
-              </h2>
+            <section aria-label="Check delivery" className="mb-6">
+              <h2 className="text-sm font-bold text-gray-900 mb-3">Check for Delivery Details</h2>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -424,67 +432,67 @@ export default function ProductDetailClient({
               </div>
             </section>
 
+            <hr className="border-gray-100 mb-6" />
+
+            {/* ── KEY HIGHLIGHTS (in right column) ─────────────── */}
+            <section aria-label="Key highlights" className="mb-6">
+              <h2 className="text-base font-extrabold text-gray-900 mb-1">Key Highlights</h2>
+              <div className="h-[3px] w-8 bg-yellow-400 rounded-full mb-4" />
+              <dl className="grid grid-cols-2 border border-gray-100 rounded-xl overflow-hidden">
+                {product.highlights.map((h, i) => (
+                  <div
+                    key={h.label}
+                    className={`px-4 py-3.5 bg-white border-b border-gray-100
+                      ${i % 2 === 0 ? "border-r border-gray-100" : ""}`}
+                  >
+                    <dt className="text-xs text-gray-400 font-medium mb-0.5">{h.label}</dt>
+                    <dd className="text-sm text-gray-900 font-bold">{h.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+
+            {/* ── ACCORDIONS ───────────────────────────────────── */}
+            <div className="mb-6">
+              <AccordionItem
+                icon={<span style={{ fontSize: 18 }}>☰</span>}
+                title="Product Description"
+                subtitle="Manufacture, Care and Fit"
+              >
+                <p itemProp="description">{product.description}</p>
+              </AccordionItem>
+              <AccordionItem
+                icon={<HiArrowPath size={18} />}
+                title="15 Days Returns & Exchange"
+                subtitle="Know about return & exchange policy"
+              >
+                <p>{product.returnPolicy}</p>
+              </AccordionItem>
+            </div>
+
+            {/* ── TRUST BADGES ─────────────────────────────────── */}
+            <div className="flex items-center justify-around flex-wrap gap-4 py-5 border-t border-b border-gray-100">
+              {[
+                { icon: "🏅", label: "100% Genuine Product" },
+                { icon: "🛒", label: "100% Secure Payment" },
+                { icon: "📦", label: "Easy Returns & Refunds" },
+              ].map((b) => (
+                <div key={b.label} className="flex flex-col items-center gap-1.5 text-center">
+                  <span className="text-3xl">{b.icon}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wide text-gray-500 leading-tight max-w-[80px]">
+                    {b.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+
           </div>
         </article>
 
         {/* ══════════════════════════════════════════════════════════
-            FULL-WIDTH SECTIONS BELOW THE TWO-COLUMN LAYOUT
-            These appear below BOTH columns, spanning the full width.
+            FULL-WIDTH BELOW — Reviews + Related Products
         ══════════════════════════════════════════════════════════ */}
-        <div className="mt-10 border-t border-gray-100 pt-10">
-
-          {/* Key Highlights */}
-          <section aria-label="Key highlights" className="mb-8 max-w-4xl">
-            <h2 className="text-lg font-extrabold text-gray-900 mb-1">Key Highlights</h2>
-            <div className="h-[3px] w-10 bg-yellow-400 rounded-full mb-5" />
-            <dl className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-0 border border-gray-100 rounded-xl overflow-hidden">
-              {product.highlights.map((h, i) => (
-                <div
-                  key={h.label}
-                  className={`px-4 py-4 bg-white border-b border-r border-gray-100
-                    ${i % 2 === 1 ? "border-r-0 sm:border-r" : ""}
-                    `}
-                >
-                  <dt className="text-xs text-gray-400 font-medium mb-1">{h.label}</dt>
-                  <dd className="text-sm text-gray-900 font-bold">{h.value}</dd>
-                </div>
-              ))}
-            </dl>
-          </section>
-
-          {/* Accordions */}
-          <div className="mb-6 max-w-4xl">
-            <AccordionItem
-              icon={<span style={{ fontSize: 18 }}>☰</span>}
-              title="Product Description"
-              subtitle="Manufacture, Care and Fit"
-            >
-              <p itemProp="description">{product.description}</p>
-            </AccordionItem>
-            <AccordionItem
-              icon={<HiArrowPath size={18} />}
-              title="15 Days Returns & Exchange"
-              subtitle="Know about return & exchange policy"
-            >
-              <p>{product.returnPolicy}</p>
-            </AccordionItem>
-          </div>
-
-          {/* Trust Badges */}
-          <div className="flex items-center justify-center flex-wrap gap-6 sm:gap-12 py-6 border-t border-b border-gray-100 mb-10">
-            {[
-              { icon: "🏅", label: "100% Genuine Product" },
-              { icon: "🛒", label: "100% Secure Payment" },
-              { icon: "📦", label: "Easy Returns & Instant Refunds" },
-            ].map((b) => (
-              <div key={b.label} className="flex flex-col items-center gap-1.5 text-center">
-                <span className="text-3xl">{b.icon}</span>
-                <span className="text-[10px] font-bold uppercase tracking-wide text-gray-500 leading-tight max-w-[80px]">
-                  {b.label}
-                </span>
-              </div>
-            ))}
-          </div>
+        <div className="mt-10 border-t border-gray-100 pt-8">
 
           {/* Reviews */}
           <section className="mb-12 max-w-4xl" aria-label="Product reviews">
@@ -496,10 +504,7 @@ export default function ProductDetailClient({
                   key={tab}
                   onClick={() => setActiveReviewTab(tab)}
                   className={`flex-1 py-3 text-sm font-semibold cursor-pointer border-0 transition-all duration-150
-                    ${activeReviewTab === tab
-                      ? "bg-gray-900 text-white"
-                      : "bg-white text-gray-400 hover:bg-gray-50"
-                    }`}
+                    ${activeReviewTab === tab ? "bg-gray-900 text-white" : "bg-white text-gray-400 hover:bg-gray-50"}`}
                   aria-selected={activeReviewTab === tab}
                   role="tab"
                 >
@@ -520,9 +525,7 @@ export default function ProductDetailClient({
           <section className="mb-10" aria-label="Related products">
             <div className="flex items-center gap-4 mb-2">
               <span className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-200 to-gray-200 hidden sm:block" />
-              <h2 className="text-xl font-black text-gray-900 uppercase tracking-wider shrink-0">
-                You May Also Like
-              </h2>
+              <h2 className="text-xl font-black text-gray-900 uppercase tracking-wider shrink-0">You May Also Like</h2>
               <span className="flex-1 h-px bg-gradient-to-l from-transparent via-gray-200 to-gray-200 hidden sm:block" />
             </div>
             <div className="flex justify-center mb-5">

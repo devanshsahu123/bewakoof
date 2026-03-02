@@ -44,7 +44,7 @@ export interface ProductDetail extends Product {
     breadcrumb: { label: string; href: string }[];
 }
 
-const DEMO_IMAGE = "https://images.bewakoof.com/uploads/grid/app/Desktop-T-shirt-Widgets-360x400-3--1772133771.jpg";
+const DEMO_IMAGE = "https://images.bewakoof.com/t1080/men-s-black-venom-graphic-printed-oversized-t-shirt-651229-1731501911-1.jpg";
 
 export const denimProducts: Product[] = [
     {
@@ -136,11 +136,12 @@ export const denimProducts: Product[] = [
 // ── Detailed product data map keyed by slug ──────────────────────────────────
 
 const GALLERY_IMAGES = [
-    "https://images.bewakoof.com/uploads/grid/app/Desktop-T-shirt-Widgets-360x400-3--1772133771.jpg",
-    "https://images.bewakoof.com/uploads/grid/app/Desktop-T-shirt-Widgets-360x400-1--1772133763.jpg",
-    "https://images.bewakoof.com/uploads/grid/app/Desktop-T-shirt-Widgets-360x400-2--1772133766.jpg",
-    "https://images.bewakoof.com/uploads/grid/app/1x1-men-s-blue-hang-in-around-graphic-printed-oversized-t-shirt--1770513882.jpg",
-    "https://images.bewakoof.com/uploads/grid/app/1x1-men-s-blue-hang-in-around-graphic-printed-oversized-t-shirt-739736-1770513882.jpg",
+    "https://images.bewakoof.com/t1080/men-s-black-venom-graphic-printed-oversized-t-shirt-651229-1731501911-1.jpg",
+    "https://images.bewakoof.com/t1080/men-s-black-venom-graphic-printed-oversized-t-shirt-651229-1729235299-3.jpg",
+    "https://images.bewakoof.com/t1080/men-s-black-venom-graphic-printed-oversized-t-shirt-651229-1729235304-4.jpg",
+    "https://images.bewakoof.com/t1080/men-s-black-venom-graphic-printed-oversized-t-shirt-651229-1729235308-5.jpg",
+    "https://images.bewakoof.com/t1080/men-s-black-venom-graphic-printed-oversized-t-shirt-651229-1729235312-6.jpg",
+    "https://images.bewakoof.com/t1080/men-s-black-venom-graphic-printed-oversized-t-shirt-651229-1734587867-10.jpg"
 ];
 
 const DEFAULT_SIZES: SizeOption[] = [
