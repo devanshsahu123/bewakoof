@@ -413,7 +413,7 @@ export default function ProductDetailClient({
             </section>
 
             {/* Delivery checker */}
-            <section aria-label="Check delivery" className="mb-6">
+            {/* <section aria-label="Check delivery" className="mb-6">
               <h2 className="text-sm font-bold text-gray-900 mb-3">Check for Delivery Details</h2>
               <div className="flex gap-2">
                 <input
@@ -430,7 +430,7 @@ export default function ProductDetailClient({
                   Check
                 </button>
               </div>
-            </section>
+            </section> */}
 
             <hr className="border-gray-100 mb-6" />
 
