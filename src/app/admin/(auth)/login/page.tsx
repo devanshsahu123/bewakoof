@@ -26,74 +26,116 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center
-                    bg-[#0f0f1a] px-6 py-12">
-      <div className="w-full max-w-[420px] rounded-2xl border border-yellow-400/15
-                      bg-[#1a1a2e] p-10 shadow-[0_24px_64px_rgba(0,0,0,0.4)]">
+    <div className="flex min-h-screen bg-gray-50">
+      {/* ── Left branding panel (md+) ── */}
+      <div
+        className="hidden md:flex flex-col justify-center items-start px-14 py-16 flex-[0_0_46%] relative overflow-hidden"
+        style={{ background: "linear-gradient(140deg,#fdd835 0%,#ff9800 55%,#ff5200 100%)" }}
+      >
+        {/* Decorative blobs */}
+        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white/20 pointer-events-none" />
+        <div className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full bg-white/20 pointer-events-none" />
 
-        {/* Logo */}
-        <div className="mb-8 flex items-center gap-2">
-          <span className="text-xl">⚡</span>
-          <span className="flex-1 text-lg font-black text-white tracking-tight">{process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}</span>
-          <span className="rounded-full bg-yellow-400/15 px-2 py-0.5
-                           text-[0.6rem] font-bold uppercase tracking-widest text-yellow-400">
-            Admin
-          </span>
+        <div className="relative z-10">
+          <h1 className="text-5xl font-black uppercase tracking-tight text-gray-900 leading-none mb-2">
+            {process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}
+            <sup className="text-[0.4em] align-super font-bold ml-1">®</sup>
+          </h1>
+          <p className="text-sm font-semibold text-black/60 mb-10 tracking-wide">
+            Admin Control Panel
+          </p>
+
+          <ul className="flex flex-col gap-3">
+            {[
+              "Manage orders & inventory",
+              "Track users & activity",
+              "Configure coupons & offers",
+              "Monitor revenue in real-time",
+            ].map((item) => (
+              <li
+                key={item}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/55 backdrop-blur-sm text-sm font-semibold text-gray-900"
+              >
+                <span className="w-2 h-2 rounded-full bg-gray-900 flex-shrink-0" />
+                {item}
+              </li>
+            ))}
+          </ul>
         </div>
+      </div>
 
-        <h1 className="text-2xl font-extrabold text-white mb-1">Welcome back</h1>
-        <p className="text-sm text-white/40 mb-8">Sign in to your admin account</p>
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          {/* Email */}
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="email" className="text-sm font-semibold text-white/60">Email</label>
-            <input
-              id="email" type="email" required
-              value={email} onChange={(e) => setEmail(e.target.value)}
-              placeholder={`admin@${(process.env.NEXT_PUBLIC_APP_NAME || "siyapaa").toLowerCase()}.com`} autoComplete="email"
-              className="w-full rounded-lg border border-white/10 bg-white/[0.06]
-                         px-4 py-3 text-white text-sm outline-none
-                         placeholder:text-white/25
-                         transition-all duration-200
-                         focus:border-yellow-400 focus:shadow-[0_0_0_3px_rgba(255,215,0,0.1)]"
-            />
+      {/* ── Right login form ── */}
+      <div className="flex flex-1 items-center justify-center px-6 py-12">
+        <div className="w-full max-w-sm bg-white border border-gray-200 rounded-2xl p-10 shadow-lg">
+          {/* Logo inside card */}
+          <div className="flex items-center gap-2 mb-7">
+            <span className="text-base font-black uppercase tracking-tight text-gray-900">
+              {process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}
+            </span>
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-yellow-400 text-gray-900 uppercase tracking-widest">
+              Admin
+            </span>
           </div>
 
-          {/* Password */}
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="password" className="text-sm font-semibold text-white/60">Password</label>
-            <input
-              id="password" type="password" required
-              value={password} onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••" autoComplete="current-password"
-              className="w-full rounded-lg border border-white/10 bg-white/[0.06]
-                         px-4 py-3 text-white text-sm outline-none
-                         placeholder:text-white/25
-                         transition-all duration-200
-                         focus:border-yellow-400 focus:shadow-[0_0_0_3px_rgba(255,215,0,0.1)]"
-            />
-          </div>
+          <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight mb-1">
+            Welcome back
+          </h2>
+          <p className="text-sm text-gray-400 mb-8">Sign in to your admin account</p>
 
-          {/* Error */}
-          {error && (
-            <p className="rounded-lg border border-red-500/20 bg-red-500/10
-                          px-4 py-2.5 text-sm text-red-400">
-              {error}
-            </p>
-          )}
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            {/* Email */}
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="email" className="text-xs font-semibold text-gray-600">
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={`admin@${(
+                  process.env.NEXT_PUBLIC_APP_NAME || "siyapaa"
+                ).toLowerCase()}.com`}
+                autoComplete="email"
+                className="w-full px-3.5 py-2.5 text-sm bg-gray-100 border border-gray-200 rounded-lg outline-none focus:bg-white focus:border-yellow-400 focus:ring-2 focus:ring-yellow-300/30 placeholder-gray-400 transition-all"
+              />
+            </div>
 
-          {/* Submit */}
-          <button
-            type="submit" disabled={loading}
-            className="mt-1 w-full rounded-lg bg-yellow-400 py-3 text-sm font-bold
-                       text-black transition-all duration-200
-                       hover:opacity-90 hover:-translate-y-px
-                       disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {loading ? "Signing in…" : "Sign In"}
-          </button>
-        </form>
+            {/* Password */}
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="password" className="text-xs font-semibold text-gray-600">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                autoComplete="current-password"
+                className="w-full px-3.5 py-2.5 text-sm bg-gray-100 border border-gray-200 rounded-lg outline-none focus:bg-white focus:border-yellow-400 focus:ring-2 focus:ring-yellow-300/30 placeholder-gray-400 transition-all"
+              />
+            </div>
+
+            {/* Error */}
+            {error && (
+              <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                {error}
+              </p>
+            )}
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 mt-1 bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-bold text-sm rounded-lg transition-all duration-150 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+            >
+              {loading ? "Signing in…" : "Sign In →"}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
