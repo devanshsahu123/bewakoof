@@ -15,13 +15,7 @@ import {
 } from "react-icons/hi2";
 
 const navItems = [
-  { icon: HiOutlineSquares2X2, label: "Dashboard", href: "/admin/dashboard" },
-  { icon: HiOutlineShoppingBag, label: "Orders",    href: "/admin/orders"    },
-  { icon: HiOutlineCube,        label: "Products",  href: "/admin/products"  },
-  { icon: HiOutlineUsers,       label: "Users",     href: "/admin/users"     },
-  { icon: HiOutlineTag,         label: "Coupons",   href: "/admin/coupons"   },
-  { icon: HiOutlineChatBubbleLeftRight, label: "Reviews", href: "/admin/reviews" },
-  { icon: HiOutlineCog6Tooth,   label: "Settings",  href: "/admin/settings"  },
+  { icon: HiOutlineSquares2X2, label: "media-upload", href: "/admin/media" }
 ];
 
 interface AdminSidebarProps {
