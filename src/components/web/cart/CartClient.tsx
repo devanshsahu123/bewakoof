@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -521,6 +522,7 @@ function EmptyCart() {
    Main CartClient Component
 ───────────────────────────────────────────── */
 export default function CartClient() {
+  const router = useRouter();
   const { cart, removeFromCart } = useCart();
   const [items, setItems] = useState<import("@/hooks/useCart").CartItem[]>([]);
   const [coupon, setCoupon] = useState<string | null>(null);
@@ -781,6 +783,7 @@ export default function CartClient() {
 
               {/* Checkout CTA */}
               <button
+                onClick={() => router.push("/checkout")}
                 className="w-full mt-5 flex items-center justify-center gap-2.5 py-4 rounded-2xl text-sm font-extrabold uppercase tracking-widest transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 text-gray-900 cursor-pointer border-0"
                 style={{
                   background: "linear-gradient(90deg,#facc15 0%,#fbbf24 100%)",
