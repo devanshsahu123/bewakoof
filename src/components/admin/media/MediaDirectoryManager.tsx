@@ -25,38 +25,19 @@ import {
   HiOutlineSearch,
   HiOutlineX,
   HiOutlineCheck,
-  HiOutlineChevronRight,
-  HiOutlineChevronDown,
+  HiOutlineFolderAdd,
   HiOutlineExclamationCircle,
-  HiOutlineInformationCircle,
 } from "react-icons/hi";
 import { mediaService, MediaItem } from "@/services/admin/mediaService";
+import MediaFilesGrid from "./MediaFilesGrid";
 
-// ─── Tree Node Data ────────────────────────────────────────────────────────────
+// ─── Interfaces ───────────────────────────────────────────────────────────────
 
-interface NodeData {
-  path: string;
-  parentId: number | null;
-}
-
-type MediaNode = NodeModel<NodeData>;
+// We no longer need the tree structure, so we just use MediaItem array directly.
+// But for consistency with the rest of the code that expects an `id` and `text`,
+// we can keep a simple wrapper or just use the raw items.
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function flatToTree(items: MediaItem[]): MediaNode[] {
-  return items.map((item) => {
-    // parentId may be absent from the API response — treat missing/null/0 as root
-    const parentId: number | null =
-      item.parentId != null && item.parentId !== 0 ? item.parentId : null;
-    return {
-      id: item.id,
-      parent: parentId ?? 0,   // tree library uses 0 for root
-      droppable: true,
-      text: item.name,
-      data: { path: item.path, parentId },
-    };
-  });
-}
 
 function slugify(name: string): string {
   return name
@@ -66,35 +47,17 @@ function slugify(name: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-// ─── Custom Drag Preview ───────────────────────────────────────────────────────
-
-function DragPreview({ monitorProps }: { monitorProps: DragLayerMonitorProps<NodeData> }) {
-  const { item } = monitorProps;
-  return (
-    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-yellow-400 text-gray-900 shadow-xl text-sm font-semibold opacity-90 pointer-events-none">
-      <HiOutlineFolder size={16} />
-      {item?.text}
-    </div>
-  );
-}
-
 // ─── Add Folder Modal ──────────────────────────────────────────────────────────
 
 interface AddFolderModalProps {
-  parentNode?: MediaNode | null;
   onClose: () => void;
-  onAdd: (name: string, parentId: number | null) => Promise<void>;
+  onAdd: (name: string) => Promise<void>;
 }
 
-function AddFolderModal({ parentNode, onClose, onAdd }: AddFolderModalProps) {
+function AddFolderModal({ onClose, onAdd }: AddFolderModalProps) {
   const [name, setName] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -103,14 +66,14 @@ function AddFolderModal({ parentNode, onClose, onAdd }: AddFolderModalProps) {
       setError("Folder name cannot be empty.");
       return;
     }
-    setLoading(true);
+    setSubmitting(true);
     try {
-      await onAdd(trimmed, parentNode ? (parentNode.id as number) : null);
+      await onAdd(trimmed);
       onClose();
-    } catch {
-      setError("Failed to create folder. Please try again.");
+    } catch (err: any) {
+      setError(err?.response?.data?.message || err.message || "Failed to create folder. Please try again.");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   }
 
@@ -124,10 +87,10 @@ function AddFolderModal({ parentNode, onClose, onAdd }: AddFolderModalProps) {
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
           <div className="flex items-center gap-2">
             <div className="p-1.5 rounded-lg bg-yellow-400/10">
-              <HiOutlineFolderOpen size={18} className="text-yellow-400" />
+              <HiOutlineFolderAdd size={18} className="text-yellow-400" />
             </div>
             <h2 className="text-base font-semibold text-white">
-              {parentNode ? `Add inside "${parentNode.text}"` : "Add Root Folder"}
+              Add Root Folder
             </h2>
           </div>
           <button
@@ -145,7 +108,8 @@ function AddFolderModal({ parentNode, onClose, onAdd }: AddFolderModalProps) {
               Folder Name
             </label>
             <input
-              ref={inputRef}
+            type="text"
+            required
               value={name}
               onChange={(e) => {
                 setName(e.target.value);
@@ -172,10 +136,10 @@ function AddFolderModal({ parentNode, onClose, onAdd }: AddFolderModalProps) {
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={submitting}
               className="flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold bg-yellow-400 text-gray-900 hover:bg-yellow-300 disabled:opacity-50 transition-colors"
             >
-              {loading ? "Creating…" : "Create Folder"}
+              {submitting ? "Creating…" : "Create Folder"}
             </button>
           </div>
         </form>
@@ -186,24 +150,14 @@ function AddFolderModal({ parentNode, onClose, onAdd }: AddFolderModalProps) {
 
 // ─── Delete Confirm Modal ──────────────────────────────────────────────────────
 
-interface DeleteConfirmProps {
-  node: MediaNode;
+interface DeleteConfirmModalProps {
+  node: MediaItem;
   onClose: () => void;
   onConfirm: () => Promise<void>;
 }
 
-function DeleteConfirmModal({ node, onClose, onConfirm }: DeleteConfirmProps) {
-  const [loading, setLoading] = useState(false);
-
-  async function handleDelete() {
-    setLoading(true);
-    try {
-      await onConfirm();
-      onClose();
-    } finally {
-      setLoading(false);
-    }
-  }
+function DeleteConfirmModal({ node, onClose, onConfirm }: DeleteConfirmModalProps) {
+  const [deleting, setDeleting] = useState(false);
 
   return (
     <div
@@ -220,9 +174,10 @@ function DeleteConfirmModal({ node, onClose, onConfirm }: DeleteConfirmProps) {
           <div className="text-center space-y-1">
             <h2 className="text-base font-semibold text-white">Delete Folder</h2>
             <p className="text-sm text-white/50">
-              Delete{" "}
-              <span className="text-white font-medium">"{node.text}"</span>?
-              This action cannot be undone.
+              Are you sure you want to delete{" "}
+              <span className="text-white font-medium">"{node.name}"</span>?
+              This will also delete any files inside it. This action cannot be
+              undone.
             </p>
           </div>
           <div className="flex gap-3 pt-1">
@@ -233,11 +188,14 @@ function DeleteConfirmModal({ node, onClose, onConfirm }: DeleteConfirmProps) {
               Cancel
             </button>
             <button
-              onClick={handleDelete}
-              disabled={loading}
+              onClick={async () => {
+                setDeleting(true);
+                await onConfirm();
+              }}
+              disabled={deleting}
               className="flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold bg-red-500 text-white hover:bg-red-400 disabled:opacity-50 transition-colors"
             >
-              {loading ? "Deleting…" : "Delete"}
+              {deleting ? "Deleting…" : "Delete"}
             </button>
           </div>
         </div>
@@ -246,37 +204,25 @@ function DeleteConfirmModal({ node, onClose, onConfirm }: DeleteConfirmProps) {
   );
 }
 
-// ─── Skeleton Loader ──────────────────────────────────────────────────────────
-
-function SkeletonRow({ depth = 0 }: { depth?: number }) {
-  return (
-    <div
-      className="flex items-center gap-3 px-4 py-3 animate-pulse"
-      style={{ paddingLeft: `${16 + depth * 24}px` }}
-    >
-      <div className="w-4 h-4 rounded bg-white/10" />
-      <div className="w-4 h-4 rounded bg-white/10" />
-      <div className="h-3 rounded bg-white/10" style={{ width: `${60 + 8 * 120}px` }} />
-    </div>
-  );
-}
-
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function MediaDirectoryManager() {
-  const [treeData, setTreeData] = useState<MediaNode[]>([]);
+  const [folders, setFolders] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
 
+  // Selected folder for showing files
+  const [selectedFolderId, setSelectedFolderId] = useState<number | null>(null);
+
   // Modals
   const [showAddModal, setShowAddModal] = useState(false);
-  const [addParent, setAddParent] = useState<MediaNode | null | undefined>(null);
-  const [deleteTarget, setDeleteTarget] = useState<MediaNode | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<MediaItem | null>(null);
 
   // Inline edit
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingText, setEditingText] = useState("");
+  const editInputRef = useRef<HTMLInputElement>(null);
 
   // ─── Fetch ───────────────────────────────────────────────────────────────────
 
@@ -285,7 +231,11 @@ export default function MediaDirectoryManager() {
     setError(null);
     try {
       const items = await mediaService.getAll();
-      setTreeData(flatToTree(items));
+      setFolders(items);
+      // Optional: automatically select the first folder if none selected
+      if (items.length > 0 && selectedFolderId === null) {
+        setSelectedFolderId(items[0].id);
+      }
     } catch (err: unknown) {
       const msg =
         err instanceof Error ? err.message : "Failed to load media directories.";
@@ -293,7 +243,7 @@ export default function MediaDirectoryManager() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [selectedFolderId]);
 
   useEffect(() => {
     fetchAll();
@@ -302,166 +252,95 @@ export default function MediaDirectoryManager() {
   // ─── Add ──────────────────────────────────────────────────────────────────────
 
   const handleAdd = useCallback(
-    async (name: string, parentId: number | null) => {
+    async (name: string) => {
       const path = slugify(name);
-      // parentId is the caller-supplied value — use directly, don't rely on API echo
-      const created = await mediaService.create(name, path, parentId);
-
-      const newNode: MediaNode = {
-        id: created.id,
-        parent: parentId ?? 0,
-        droppable: true,
-        text: created.name,
-        data: {
-          path: created.path ?? path,
-          parentId,
-        },
-      };
-      setTreeData((prev) => [...prev, newNode]);
+      // Always create at root level (null parent)
+      const created = await mediaService.create(name, path, null);
+      setFolders((prev) => [...prev, created]);
+      setSelectedFolderId(created.id); // Auto-select new folder
     },
     []
   );
 
   // ─── Delete ───────────────────────────────────────────────────────────────────
 
-  const handleDelete = useCallback(async (node: MediaNode) => {
-    const id = node.id as number;
+  const handleDelete = useCallback(async (node: MediaItem) => {
+    const id = node.id;
 
-    // Optimistic: remove node and all descendants
-    setTreeData((prev) => {
-      const toRemove = new Set<number>();
-      const collect = (pid: number) => {
-        prev.forEach((n) => {
-          if (n.parent === pid) {
-            toRemove.add(n.id as number);
-            collect(n.id as number);
-          }
-        });
-      };
-      toRemove.add(id);
-      collect(id);
-      return prev.filter((n) => !toRemove.has(n.id as number));
-    });
+    // Optimistic: remove node
+    setFolders((prev) => prev.filter((n) => n.id !== id));
+    if (selectedFolderId === id) setSelectedFolderId(null);
 
     try {
       await mediaService.remove(id);
-    } catch {
+    } catch (err: any) {
       // Revert on failure
+      const msg = err?.response?.data?.message || err.message || "Failed to delete folder.";
+      setError(msg);
       await fetchAll();
     }
-  }, [fetchAll]);
+  }, [fetchAll, selectedFolderId]);
 
   // ─── Rename ───────────────────────────────────────────────────────────────────
 
-  const startEdit = useCallback((node: MediaNode) => {
-    setEditingId(node.id as number);
-    setEditingText(node.text);
+  const startEdit = useCallback((node: MediaItem) => {
+    setEditingId(node.id);
+    setEditingText(node.name);
   }, []);
 
   const commitEdit = useCallback(
-    async (node: MediaNode) => {
+    async (node: MediaItem) => {
       const trimmed = editingText.trim();
-      if (!trimmed || trimmed === node.text) {
+      if (!trimmed || trimmed === node.name) {
         setEditingId(null);
         return;
       }
 
-      // Derive parentId from node.parent (authoritative tree field),
-      // not from node.data.parentId which may be stale/null.
-      const parentId: number | null =
-        node.parent !== 0 ? (node.parent as number) : null;
-
       // Optimistic
-      setTreeData((prev) =>
+      setFolders((prev) =>
         prev.map((n) =>
           n.id === node.id
-            ? { ...n, text: trimmed, data: { ...n.data!, path: slugify(trimmed), parentId } }
+            ? { ...n, name: trimmed, path: slugify(trimmed) }
             : n
         )
       );
       setEditingId(null);
 
       try {
-        await mediaService.update(node.id as number, {
+        await mediaService.update(node.id, {
           name: trimmed,
           path: slugify(trimmed),
-          parentId,
+          parentId: null, // Always root
         });
-      } catch {
-        // Revert
-        setTreeData((prev) =>
-          prev.map((n) => (n.id === node.id ? { ...n, text: node.text } : n))
+      } catch (err: any) {
+        // Revert on failure
+        const msg = err?.response?.data?.message || err.message || "Failed to rename folder.";
+        setError(msg);
+        setFolders((prev) =>
+          prev.map((n) => (n.id === node.id ? { ...n, name: node.name } : n))
         );
       }
     },
     [editingText]
   );
 
-  // ─── Drag & Drop ─────────────────────────────────────────────────────────────
+  // ─── Filtered Folders ────────────────────────────────────────────────────────
 
-  const handleDrop = useCallback(
-    async (
-      newTree: MediaNode[],
-      { dragSourceId, dropTargetId }: { dragSourceId: number | string; dropTargetId: number | string }
-    ) => {
-      const oldTree = treeData;
-
-      // newParentId is null when dropped at root (dropTargetId === 0)
-      const newParentId: number | null =
-        dropTargetId === 0 ? null : (dropTargetId as number);
-
-      // Sync data.parentId on the dragged node so subsequent operations
-      // (rename, further drags) always have the correct parentId.
-      const syncedTree = newTree.map((n) =>
-        n.id === dragSourceId
-          ? { ...n, data: { ...n.data!, parentId: newParentId } }
-          : n
-      );
-
-      // Optimistic update with synced data
-      setTreeData(syncedTree);
-
-      const draggedNode = syncedTree.find((n) => n.id === dragSourceId);
-      if (!draggedNode) return;
-
-      try {
-        await mediaService.update(dragSourceId as number, {
-          name: draggedNode.text,
-          path: slugify(draggedNode.text),
-          parentId: newParentId,
-        });
-      } catch {
-        // Revert on API failure
-        setTreeData(oldTree);
-      }
-    },
-    [treeData]
-  );
-
-  // ─── Filtered Tree ───────────────────────────────────────────────────────────
-
-  const filteredTree = search.trim()
-    ? treeData.filter((n) =>
-        n.text.toLowerCase().includes(search.trim().toLowerCase())
+  const displayFolders = search.trim()
+    ? folders.filter((n) =>
+        n.name.toLowerCase().includes(search.trim().toLowerCase())
       )
-    : treeData;
-
-  // When searching, flatten everything under root so it's visible
-  const displayTree: MediaNode[] = search.trim()
-    ? filteredTree.map((n) => ({ ...n, parent: 0 }))
-    : filteredTree;
+    : folders;
 
   // ─── Render ───────────────────────────────────────────────────────────────────
 
   return (
-    <DndProvider backend={MultiBackend} options={getBackendOptions()}>
-      <div className="min-h-full space-y-6">
+    <div className="min-h-full space-y-6">
         {/* ── Page Header ── */}
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-bold text-gray-900">Media Directories</h1>
           <p className="text-sm text-gray-500">
-            Manage folder structure for your media library. Drag to reorder or
-            nest folders.
+            Select a folder on the left to manage its files on the right.
           </p>
         </div>
 
@@ -505,10 +384,7 @@ export default function MediaDirectoryManager() {
             </button>
 
             <button
-              onClick={() => {
-                setAddParent(null);
-                setShowAddModal(true);
-              }}
+              onClick={() => setShowAddModal(true)}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-yellow-400 text-gray-900 hover:bg-yellow-300 transition shadow-sm"
             >
               <HiOutlinePlus size={16} />
@@ -531,36 +407,39 @@ export default function MediaDirectoryManager() {
           </div>
         )}
 
-        {/* ── Tree Card ── */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+        {/* ── Split Layout ── */}
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
+          {/* ── Left Column: Tree Card ── */}
+          <div className="w-full lg:w-[35%] shrink-0 flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden min-h-[500px]">
           {/* Card Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col items-center gap-2">
               <HiOutlineFolderOpen size={18} className="text-yellow-500" />
               <span className="text-sm font-semibold text-gray-700">
                 {loading
                   ? "Loading…"
-                  : `${treeData.length} folder${treeData.length !== 1 ? "s" : ""}`}
+                  : `${folders.length} folder${folders.length !== 1 ? "s" : ""}`}
               </span>
             </div>
             {search && (
               <span className="text-xs text-gray-400 flex items-center gap-1">
-                <HiOutlineInformationCircle size={13} />
-                Showing {displayTree.length} result
-                {displayTree.length !== 1 ? "s" : ""} for "{search}"
+                <HiOutlineExclamationCircle size={13} />
+                Showing {displayFolders.length} result
+                {displayFolders.length !== 1 ? "s" : ""} for "{search}"
               </span>
             )}
           </div>
 
-          {/* Tree Body */}
-          <div className="min-h-[200px]">
+          {/* Folder List Body */}
+          <div className="flex-1 overflow-y-auto">
             {loading ? (
-              <div className="py-2">
-                {[0, 0, 1, 0, 2, 1, 0].map((d, i) => (
-                  <SkeletonRow key={i} depth={d} />
-                ))}
+              <div className="py-2 animate-pulse space-y-2 px-3">
+                <div className="h-10 bg-gray-100 rounded-lg w-full"></div>
+                <div className="h-10 bg-gray-100 rounded-lg w-full"></div>
+                <div className="h-10 bg-gray-100 rounded-lg w-full"></div>
+                <div className="h-10 bg-gray-100 rounded-lg w-full"></div>
               </div>
-            ) : displayTree.length === 0 ? (
+            ) : displayFolders.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
                 <div className="p-4 rounded-full bg-gray-50 mb-3">
                   <HiOutlineFolder size={28} className="text-gray-300" />
@@ -570,10 +449,7 @@ export default function MediaDirectoryManager() {
                 </p>
                 {!search && (
                   <button
-                    onClick={() => {
-                      setAddParent(null);
-                      setShowAddModal(true);
-                    }}
+                    onClick={() => setShowAddModal(true)}
                     className="mt-3 text-xs text-yellow-600 hover:text-yellow-700 font-medium"
                   >
                     + Create your first folder
@@ -581,59 +457,26 @@ export default function MediaDirectoryManager() {
                 )}
               </div>
             ) : (
-              <Tree<NodeData>
-                tree={displayTree}
-                rootId={0}
-                onDrop={handleDrop as (tree: NodeModel<NodeData>[], options: { dragSourceId: NodeModel<NodeData>["id"]; dropTargetId: NodeModel<NodeData>["id"]; dragSource: NodeModel<NodeData> | null; dropTarget: NodeModel<NodeData> | null; }) => void}
-                canDrop={(tree, { dropTargetId }) => dropTargetId === 0}
-                dragPreviewRender={(monitorProps) => (
-                  <DragPreview monitorProps={monitorProps} />
-                )}
-                classes={{
-                  root: "w-full py-1",
-                  container: "w-full",
-                  draggingSource: "opacity-40",
-                  dropTarget: "bg-yellow-50 border-l-2 border-yellow-400",
-                }}
-                render={(node, { depth, isOpen, onToggle }) => {
-                  const isEditing = editingId === (node.id as number);
-                  const hasChildren = displayTree.some((n) => n.parent === node.id);
-
+              <div className="divide-y divide-gray-50">
+                {displayFolders.map((node) => {
+                  const isEditing = editingId === node.id;
+                  
                   return (
                     <div
+                      key={node.id}
+                      onClick={() => setSelectedFolderId(node.id)}
                       className={`
-                        group flex items-center gap-2 px-4 py-2.5 cursor-pointer
-                        hover:bg-gray-50 transition-colors rounded-none
-                        border-b border-gray-50 last:border-none
+                        group flex items-center gap-3 px-5 py-3.5 cursor-pointer
+                        hover:bg-gray-50 transition-colors
+                        ${selectedFolderId === node.id ? "bg-yellow-50 hover:bg-yellow-50 border-l-2 border-yellow-400" : "border-l-2 border-transparent"}
                       `}
-                      style={{ paddingLeft: `${16 + depth * 24}px` }}
                     >
-                      {/* Toggle chevron */}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onToggle();
-                        }}
-                        className={`
-                          flex-shrink-0 text-gray-400 hover:text-gray-700 transition-colors
-                          ${!hasChildren && !node.droppable ? "invisible" : ""}
-                        `}
-                        style={{ width: 16 }}
-                        tabIndex={-1}
-                      >
-                        {isOpen ? (
-                          <HiOutlineChevronDown size={13} />
-                        ) : (
-                          <HiOutlineChevronRight size={13} />
-                        )}
-                      </button>
-
                       {/* Folder icon */}
                       <div className="flex-shrink-0 text-yellow-500">
-                        {isOpen ? (
-                          <HiOutlineFolderOpen size={17} />
+                        {selectedFolderId === node.id ? (
+                          <HiOutlineFolderOpen size={20} />
                         ) : (
-                          <HiOutlineFolder size={17} />
+                          <HiOutlineFolder size={20} />
                         )}
                       </div>
 
@@ -648,23 +491,21 @@ export default function MediaDirectoryManager() {
                             if (e.key === "Enter") commitEdit(node);
                             if (e.key === "Escape") setEditingId(null);
                           }}
-                          className="flex-1 text-sm rounded px-2 py-0.5 bg-white border border-yellow-400 ring-1 ring-yellow-400 text-gray-900 outline-none"
+                          className="flex-1 text-sm rounded px-3 py-1 bg-white border border-yellow-400 ring-1 ring-yellow-400 text-gray-900 outline-none"
                           onClick={(e) => e.stopPropagation()}
                         />
                       ) : (
-                        <span
-                          className="flex-1 text-sm text-gray-800 truncate select-none"
-                          title={node.text}
-                        >
-                          {node.text}
-                        </span>
-                      )}
-
-                      {/* Path badge */}
-                      {!isEditing && (
-                        <span className="hidden sm:block text-[11px] text-gray-400 truncate max-w-[140px]">
-                          {node.data?.path}
-                        </span>
+                        <div className="flex flex-col flex-1 min-w-0">
+                          <span
+                            className={`text-sm font-medium truncate ${selectedFolderId === node.id ? "text-yellow-900" : "text-gray-800"}`}
+                            title={node.name}
+                          >
+                            {node.name}
+                          </span>
+                          <span className="text-[11px] text-gray-400 truncate">
+                            /{node.path}
+                          </span>
+                        </div>
                       )}
 
                       {/* Action buttons */}
@@ -672,7 +513,7 @@ export default function MediaDirectoryManager() {
                         className={`
                           flex items-center gap-1 flex-shrink-0
                           ${isEditing ? "flex" : "opacity-0 group-hover:opacity-100"}
-                          transition-opacity
+                          transition-opacity focus-within:opacity-100
                         `}
                         onClick={(e) => e.stopPropagation()}
                       >
@@ -695,57 +536,56 @@ export default function MediaDirectoryManager() {
                           </>
                         ) : (
                           <>
-                            {/* Only show "Add subfolder" if it's a root folder (depth === 0) */}
-                            {depth === 0 && (
-                              <button
-                                onClick={() => {
-                                  setAddParent(node);
-                                  setShowAddModal(true);
-                                }}
-                                className="p-1.5 rounded-lg text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 transition-colors"
-                                title="Add subfolder"
-                              >
-                                <HiOutlinePlus size={13} />
-                              </button>
-                            )}
                             <button
-                              onClick={() => startEdit(node)}
-                              className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                startEdit(node);
+                              }}
+                              className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors focus:opacity-100"
                               title="Rename"
                             >
-                              <HiOutlinePencil size={13} />
+                              <HiOutlinePencil size={15} />
                             </button>
                             <button
-                              onClick={() => setDeleteTarget(node)}
-                              className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteTarget(node);
+                              }}
+                              className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors focus:opacity-100"
                               title="Delete"
                             >
-                              <HiOutlineTrash size={13} />
+                              <HiOutlineTrash size={15} />
                             </button>
                           </>
                         )}
                       </div>
                     </div>
                   );
-                }}
-              />
+                })}
+              </div>
             )}
           </div>
+          
+          {/* ── Tip ── */}
+          {!loading && folders.length > 0 && !search && (
+            <div className="px-5 py-3 border-t border-gray-100 bg-gray-50">
+              <p className="text-[11px] text-gray-500 text-center flex items-center justify-center gap-1">
+                <HiOutlineExclamationCircle size={13} />
+                Click a folder to view and upload files.
+              </p>
+            </div>
+          )}
         </div>
 
-        {/* ── Tip ── */}
-        {!loading && treeData.length > 0 && !search && (
-          <p className="text-xs text-gray-400 text-center flex items-center justify-center gap-1.5">
-            <HiOutlineInformationCircle size={13} />
-            Drag folders to reorder them or drag one folder into another to create a single-level structure.
-          </p>
-        )}
+        {/* ── Right Column: Files Grid ── */}
+        <div className="w-full lg:w-[65%] min-h-[500px]">
+          <MediaFilesGrid folderId={selectedFolderId} />
+        </div>
       </div>
 
       {/* ── Modals ── */}
       {showAddModal && (
         <AddFolderModal
-          parentNode={addParent}
           onClose={() => setShowAddModal(false)}
           onAdd={handleAdd}
         />
@@ -758,6 +598,6 @@ export default function MediaDirectoryManager() {
           onConfirm={() => handleDelete(deleteTarget)}
         />
       )}
-    </DndProvider>
+    </div>
   );
 }
