@@ -12,10 +12,11 @@ import {
   HiOutlineTag,
   HiOutlineArrowLeft,
   HiOutlineXMark,
+  HiOutlineFolder,
 } from "react-icons/hi2";
 
 const navItems = [
-  { icon: HiOutlineSquares2X2, label: "media-upload", href: "/admin/media" }
+  { icon: HiOutlineFolder, label: "Media", href: "/admin/media" },
 ];
 
 interface AdminSidebarProps {
