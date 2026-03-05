@@ -64,3 +64,24 @@ export interface ApiError {
     statusCode: number;
     errors?: Record<string, string[]>;
 }
+
+/** Shape returned by GET /api/v1/customer/products/ */
+export interface CustomerProduct {
+    variantId: number;
+    sku: string;
+    productName: string;
+    categoryName: string;
+    rating: string;
+    price: string;
+    stockQuantity: number;
+    image: string | null;
+}
+
+export interface CustomerProductsResponse {
+    message: string;
+    data: CustomerProduct[];
+    meta: {
+        page: number;
+        limit: number;
+    };
+}
