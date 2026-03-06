@@ -57,11 +57,10 @@ export interface CreateMediaPayload {
     media_directory_id?: number; // omit for root; min 1
 }
 
-/** PUT /admin/media/:id body */
 export interface UpdateMediaPayload {
     name?: string;
     path?: string;
-    media_directory_id?: number; // omit for root; min 1
+    media_directory_id?: number | null; // allow null for root
 }
 
 // ─── Axios instance with hardcoded admin token ────────────────────────────────
@@ -186,7 +185,7 @@ export const mediaService = {
         if (opts.path !== undefined) payload.path = opts.path;
         // Only include media_directory_id if parentId was explicitly provided
         if ("parentId" in opts) {
-            Object.assign(payload, buildParentPayload(opts.parentId ?? null));
+            payload.media_directory_id = opts.parentId ?? null;
         }
         const { data } = await adminAxios.put<MediaResponse>(
             `/admin/media/${id}`,
