@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/store/authStore";
 import {
   HiChevronRight,
   HiOutlineShieldCheck,
@@ -244,7 +245,15 @@ function LeftPanel() {
 /* ─── Main ───────────────────────────────────────── */
 export default function SignupClient() {
   const router = useRouter();
+  const { isAuthenticated, setAuth } = useAuth();
   const [step, setStep] = useState<Step>("form");
+
+  /* ── Redirect away if already logged in ── */
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace("/");
+    }
+  }, [isAuthenticated, router]);
 
   /* form state */
   const [fullName, setFullName] = useState("");
@@ -259,6 +268,9 @@ export default function SignupClient() {
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState("");
   const [devOtp, setDevOtp] = useState(""); // OTP returned in dev mode
+
+  /* ── Early return while redirect is happening ── */
+  if (isAuthenticated) return null;
 
   /* ── Split full name into first + last ── */
   const splitName = (name: string) => {
@@ -324,9 +336,11 @@ export default function SignupClient() {
         otp: otpString,
       });
       if (ok) {
-        // Save JWT if returned
+        // Save JWT via context so navbar updates immediately
         const token = (data.token || data.access_token || data.jwt) as string | undefined;
-        if (token) localStorage.setItem("auth_token", token);
+        if (token) {
+          setAuth(token);
+        }
         setStep("success");
       } else {
         const msg = (data.message || data.error || "Invalid OTP. Please try again.") as string;

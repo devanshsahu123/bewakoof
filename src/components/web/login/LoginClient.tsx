@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/store/authStore";
 import {
   HiChevronRight,
   HiOutlineShieldCheck,
@@ -224,7 +225,15 @@ function LeftPanel() {
 /* ─── Main ───────────────────────────────────────── */
 export default function LoginClient() {
   const router = useRouter();
+  const { isAuthenticated, setAuth } = useAuth();
   const [step, setStep] = useState<Step>("login");
+
+  /* ── Redirect away if already logged in ── */
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace("/");
+    }
+  }, [isAuthenticated, router]);
 
   /* login state */
   const [identifier, setIdentifier] = useState("");
@@ -246,6 +255,9 @@ export default function LoginClient() {
   const [resetLoading, setResetLoading] = useState(false);
   const [resetError, setResetError] = useState("");
 
+  /* ── Early return while redirect is happening ── */
+  if (isAuthenticated) return null;
+
   /* ── Login handler ── */
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -255,9 +267,12 @@ export default function LoginClient() {
       // identifier = email; password is case-sensitive (sent as-is)
       const { ok, data } = await apiPost("/customer/auth/login", { identifier, password });
       if (ok) {
-        const token = (data.token || data.access_token || data.jwt) as string | undefined;
-        if (token) localStorage.setItem("auth_token", token);
-        router.push("/");
+        const innerData = (data.data as Record<string, unknown>) ?? {};
+        const token = (innerData.token) as string | undefined;
+        if (token) {
+          setAuth(token);
+          router.push("/");
+        }
       } else {
         const msg = (data.message || data.error || "Invalid credentials. Please try again.") as string;
         setLoginError(msg);
