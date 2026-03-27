@@ -138,7 +138,7 @@ export default function Header() {
                    <HiOutlineMagnifyingGlass className="w-[20px] h-[20px] sm:w-[22px] sm:h-[22px] stroke-[1.5]" />
                  </button>
 
-                <Link href="/account" className="hidden lg:flex text-black text-[13px] font-[500] hover:text-[#fdd835] transition-colors items-center">
+                <Link href="/login" className="hidden lg:flex text-black text-[13px] font-[500] hover:text-[#fdd835] transition-colors items-center">
                   Login
                 </Link>
 
@@ -177,7 +177,7 @@ export default function Header() {
       >
         {/* Drawer Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-gray-50">
-          <Link href="/account" className="flex items-center gap-3" onClick={() => setIsMobileMenuOpen(false)}>
+          <Link href="/login" className="flex items-center gap-3" onClick={() => setIsMobileMenuOpen(false)}>
             <div className="bg-white p-2 rounded-full border border-gray-200">
               <HiOutlineUser size={24} className="text-gray-600" />
             </div>

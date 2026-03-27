@@ -16,7 +16,7 @@ interface AuthState {
 }
 
 interface AuthContextValue extends AuthState {
-  setAuth: (user: User, token: string) => void;
+  setAuth: (token: string, user?: User) => void;
   clearAuth: () => void;
 }
 
@@ -26,17 +26,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>(() => {
     if (typeof window === "undefined")
       return { user: null, token: null, isAuthenticated: false };
-    const token = localStorage.getItem("web_token");
+    // Support both token key names
+    const token =
+      localStorage.getItem("web_token") || localStorage.getItem("auth_token");
     return { user: null, token, isAuthenticated: !!token };
   });
 
-  const setAuth = useCallback((user: User, token: string) => {
+  const setAuth = useCallback((token: string, user?: User) => {
     localStorage.setItem("web_token", token);
-    setState({ user, token, isAuthenticated: true });
+    localStorage.removeItem("auth_token"); // unify to web_token
+    setState({ user: user ?? null, token, isAuthenticated: true });
   }, []);
 
   const clearAuth = useCallback(() => {
     localStorage.removeItem("web_token");
+    localStorage.removeItem("auth_token");
     setState({ user: null, token: null, isAuthenticated: false });
   }, []);
 

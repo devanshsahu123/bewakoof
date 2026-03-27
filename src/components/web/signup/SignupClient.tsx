@@ -10,7 +10,7 @@ import {
   HiOutlineEnvelope,
   HiOutlineEye,
   HiOutlineEyeSlash,
-  HiArrowLeft,
+  HiOutlineUser,
   HiOutlineCheckCircle,
 } from "react-icons/hi2";
 
@@ -20,9 +20,8 @@ const PANEL_BG = "linear-gradient(160deg, #0f0f1a 0%, #12102b 55%, #1a1035 100%)
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
 
-type Step = "login" | "forgot" | "reset" | "reset-success";
+type Step = "form" | "otp" | "success";
 
-/* ─── Helpers ───────────────────────────────────── */
 async function apiPost(path: string, body: Record<string, string>) {
   const res = await fetch(`${API}${path}`, {
     method: "POST",
@@ -30,7 +29,7 @@ async function apiPost(path: string, body: Record<string, string>) {
     body: JSON.stringify(body),
   });
   let data: Record<string, unknown> = {};
-  try { data = await res.json(); } catch { /* no body */ }
+  try { data = await res.json(); } catch { /* empty */ }
   return { ok: res.ok, status: res.status, data };
 }
 
@@ -45,6 +44,7 @@ function InputRow({
   suffix,
   autoComplete,
   hint,
+  maxLength,
 }: {
   label?: string;
   type: string;
@@ -55,6 +55,7 @@ function InputRow({
   suffix?: React.ReactNode;
   autoComplete?: string;
   hint?: string;
+  maxLength?: number;
 }) {
   const [focused, setFocused] = useState(false);
   return (
@@ -81,12 +82,50 @@ function InputRow({
           onBlur={() => setFocused(false)}
           placeholder={placeholder}
           autoComplete={autoComplete}
+          maxLength={maxLength}
           required
           className="flex-1 bg-transparent px-3 py-3.5 text-[15px] text-gray-900 placeholder-gray-400 focus:outline-none font-[500] min-w-0"
         />
         {suffix && <span className="flex items-center pr-3 shrink-0">{suffix}</span>}
       </div>
       {hint && <p className="text-[11px] text-gray-400 font-[500] mt-1.5">{hint}</p>}
+    </div>
+  );
+}
+
+/* ─── OTP Boxes ──────────────────────────────────── */
+function OtpBoxes({ otp, onChange }: { otp: string[]; onChange: (o: string[]) => void }) {
+  const refs: (HTMLInputElement | null)[] = [];
+  const handleChange = (i: number, v: string) => {
+    if (!/^\d*$/.test(v)) return;
+    const next = [...otp];
+    next[i] = v.slice(-1);
+    onChange(next);
+    if (v && i < 5) refs[i + 1]?.focus();
+  };
+  const handleKey = (i: number, e: React.KeyboardEvent) => {
+    if (e.key === "Backspace" && !otp[i] && i > 0) refs[i - 1]?.focus();
+  };
+  return (
+    <div className="flex gap-2 sm:gap-3 justify-between">
+      {otp.map((d, i) => (
+        <input
+          key={i}
+          ref={(el) => { refs[i] = el; }}
+          type="text"
+          inputMode="numeric"
+          maxLength={1}
+          value={d}
+          onChange={(e) => handleChange(i, e.target.value)}
+          onKeyDown={(e) => handleKey(i, e)}
+          className="w-full h-12 sm:h-14 text-center text-xl font-[900] text-gray-900 rounded-xl border transition-all duration-200 focus:outline-none"
+          style={{
+            background: d ? "#fff" : "#f7f7f7",
+            borderColor: d ? "#ff5200" : "#e5e7eb",
+            boxShadow: d ? "0 0 0 3px rgba(255,82,0,0.12)" : "none",
+          }}
+        />
+      ))}
     </div>
   );
 }
@@ -105,23 +144,17 @@ function PrimaryBtn({ label, loading }: { label: string; loading?: boolean }) {
     >
       {loading ? (
         <>
-          <span
-            className="w-4 h-4 rounded-full border-2 border-black/20 border-t-black/70"
-            style={{ animation: "spin .7s linear infinite" }}
-          />
+          <span className="w-4 h-4 rounded-full border-2 border-black/20 border-t-black/70"
+            style={{ animation: "spin .7s linear infinite" }} />
           Please wait…
         </>
       ) : (
-        <>
-          {label}
-          <HiChevronRight size={16} strokeWidth={2.5} />
-        </>
+        <>{label}<HiChevronRight size={16} strokeWidth={2.5} /></>
       )}
     </button>
   );
 }
 
-/* ─── ErrorBox ──────────────────────────────────── */
 function ErrorBox({ msg }: { msg: string }) {
   if (!msg) return null;
   return (
@@ -131,24 +164,11 @@ function ErrorBox({ msg }: { msg: string }) {
   );
 }
 
-/* ─── SuccessBox ──────────────────────────────────── */
-function SuccessBox({ msg }: { msg: string }) {
-  if (!msg) return null;
-  return (
-    <div className="rounded-xl px-4 py-3 text-[13px] font-[600] text-green-700 bg-green-50 border border-green-200 flex items-center gap-2">
-      <HiOutlineCheckCircle size={16} />
-      {msg}
-    </div>
-  );
-}
-
 /* ─── Left brand panel ──────────────────────────── */
 function LeftPanel() {
   return (
-    <div
-      className="relative overflow-hidden flex flex-col w-full py-8 px-6 lg:w-[46%] lg:min-h-full lg:py-0 lg:px-0"
-      style={{ background: PANEL_BG }}
-    >
+    <div className="relative overflow-hidden flex flex-col w-full py-8 px-6 lg:w-[46%] lg:min-h-full lg:py-0 lg:px-0"
+      style={{ background: PANEL_BG }}>
       <div className="absolute -top-20 -left-20 w-80 h-80 rounded-full pointer-events-none"
         style={{ background: "radial-gradient(circle, rgba(255,82,0,0.22) 0%, transparent 70%)", animation: "floatA 10s ease-in-out infinite" }} />
       <div className="absolute bottom-10 -right-16 w-72 h-72 rounded-full pointer-events-none"
@@ -189,22 +209,22 @@ function LeftPanel() {
           <div className="inline-flex items-center gap-2 mb-7">
             <span className="inline-block text-[10px] font-[900] uppercase tracking-[0.22em] px-4 py-1.5 rounded-full border"
               style={{ background: "rgba(255,82,0,0.12)", borderColor: "rgba(255,82,0,0.3)", color: "#ff8c42" }}>
-              New season, fresh styles ✦
+              Join the cool kids ✦
             </span>
           </div>
           <h2 className="text-4xl xl:text-[3.2rem] font-[900] text-white leading-[1.06] tracking-tight">
-            Express{" "}
-            <span style={{ background: HERO_BG, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>yourself</span>
-            <br /><span className="text-white/35">with every fit.</span>
+            Start your{" "}
+            <span style={{ background: HERO_BG, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>style</span>
+            <br /><span className="text-white/35">journey today.</span>
           </h2>
           <div className="mt-3 h-[3px] w-16 rounded-full" style={{ background: HERO_BG }} />
           <p className="mt-6 text-white/50 text-[14px] leading-relaxed max-w-[280px] font-[400]">
-            Log in to shop the latest drops — tees, oversized fits, mobile covers and more.
+            Create your account and get access to exclusive drops, member offers, and early sale access.
           </p>
         </div>
 
         <div className="border-t pt-7 space-y-3" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
-          {["Free delivery on orders above ₹599", "Easy returns within 15 days", "Secure payments — UPI, cards, EMI"].map((p) => (
+          {["Exclusive member discounts", "Early access to new drops", "Fast checkout on every order"].map((p) => (
             <div key={p} className="flex items-center gap-3">
               <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
                 style={{ background: "rgba(255,140,66,0.18)", border: "1px solid rgba(255,140,66,0.3)" }}>
@@ -222,98 +242,116 @@ function LeftPanel() {
 }
 
 /* ─── Main ───────────────────────────────────────── */
-export default function LoginClient() {
+export default function SignupClient() {
   const router = useRouter();
-  const [step, setStep] = useState<Step>("login");
+  const [step, setStep] = useState<Step>("form");
 
-  /* login state */
-  const [identifier, setIdentifier] = useState("");
+  /* form state */
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
-  const [loginLoading, setLoginLoading] = useState(false);
-  const [loginError, setLoginError] = useState("");
+  const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState("");
 
-  /* forgot state */
-  const [forgotId, setForgotId] = useState("");
-  const [forgotLoading, setForgotLoading] = useState(false);
-  const [forgotError, setForgotError] = useState("");
-  const [forgotSuccess, setForgotSuccess] = useState("");
-  const [resetToken, setResetToken] = useState("");
+  /* otp state */
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpError, setOtpError] = useState("");
+  const [devOtp, setDevOtp] = useState(""); // OTP returned in dev mode
 
-  /* reset state */
-  const [newPassword, setNewPassword] = useState("");
-  const [showNewPw, setShowNewPw] = useState(false);
-  const [resetLoading, setResetLoading] = useState(false);
-  const [resetError, setResetError] = useState("");
-
-  /* ── Login handler ── */
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoginError("");
-    setLoginLoading(true);
-    try {
-      // identifier = email; password is case-sensitive (sent as-is)
-      const { ok, data } = await apiPost("/customer/auth/login", { identifier, password });
-      if (ok) {
-        const token = (data.token || data.access_token || data.jwt) as string | undefined;
-        if (token) localStorage.setItem("auth_token", token);
-        router.push("/");
-      } else {
-        const msg = (data.message || data.error || "Invalid credentials. Please try again.") as string;
-        setLoginError(msg);
-      }
-    } catch {
-      setLoginError("Network error. Please check your connection.");
-    } finally {
-      setLoginLoading(false);
-    }
+  /* ── Split full name into first + last ── */
+  const splitName = (name: string) => {
+    const parts = name.trim().split(/\s+/);
+    const first = parts[0] || "";
+    const last = parts.slice(1).join(" ") || "."; // API requires last_name, fallback to "."
+    return { first, last };
   };
 
-  /* ── Forgot password handler ── */
-  const handleForgot = async (e: React.FormEvent) => {
+  /* ── Signup handler ── */
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setForgotError("");
-    setForgotSuccess("");
-    setForgotLoading(true);
-    try {
-      const { ok, data } = await apiPost("/customer/auth/forgot-password", { identifier: forgotId });
-      if (ok) {
-        // In dev mode the token comes back in the response
-        const token = (data.token || data.reset_token || data.resetToken) as string | undefined;
-        if (token) setResetToken(token);
-        setForgotSuccess("Reset instructions sent! Check your email/phone.");
-        setTimeout(() => setStep("reset"), 1500);
-      } else {
-        const msg = (data.message || data.error || "Could not find that account. Please try again.") as string;
-        setForgotError(msg);
-      }
-    } catch {
-      setForgotError("Network error. Please check your connection.");
-    } finally {
-      setForgotLoading(false);
-    }
-  };
+    setFormError("");
 
-  /* ── Reset password handler ── */
-  const handleReset = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setResetError("");
-    setResetLoading(true);
+    if (fullName.trim().split(/\s+/).length < 1 || fullName.trim().length < 2) {
+      setFormError("Please enter your full name.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setFormError("Password must be at least 6 characters.");
+      return;
+    }
+
+    setFormLoading(true);
+    const { first, last } = splitName(fullName);
     try {
-      const { ok, data } = await apiPost("/customer/auth/reset-password", {
-        token: resetToken,
-        new_password: newPassword, // case-sensitive, min 6 chars
+      const { ok, data } = await apiPost("/customer/auth/signup", {
+        email,
+        first_name: first,
+        last_name: last,
+        password, // case-sensitive, sent as-is
       });
       if (ok) {
-        setStep("reset-success");
+        // Dev mode: OTP may be returned in response
+        const returnedOtp = (data.otp || data.OTP || data.code) as string | undefined;
+        if (returnedOtp) setDevOtp(String(returnedOtp));
+        setStep("otp");
       } else {
-        const msg = (data.message || data.error || "Failed to reset password. The token may have expired.") as string;
-        setResetError(msg);
+        const msg = (data.message || data.error || "Signup failed. Please try again.") as string;
+        setFormError(msg);
       }
     } catch {
-      setResetError("Network error. Please check your connection.");
+      setFormError("Network error. Please check your connection.");
     } finally {
-      setResetLoading(false);
+      setFormLoading(false);
+    }
+  };
+
+  /* ── OTP verify handler ── */
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setOtpError("");
+    const otpString = otp.join("");
+    if (otpString.length !== 6) {
+      setOtpError("Please enter all 6 digits.");
+      return;
+    }
+    setOtpLoading(true);
+    try {
+      const { ok, data } = await apiPost("/customer/auth/verify-otp", {
+        identifier: email,  // use email as identifier
+        otp: otpString,
+      });
+      if (ok) {
+        // Save JWT if returned
+        const token = (data.token || data.access_token || data.jwt) as string | undefined;
+        if (token) localStorage.setItem("auth_token", token);
+        setStep("success");
+      } else {
+        const msg = (data.message || data.error || "Invalid OTP. Please try again.") as string;
+        setOtpError(msg);
+      }
+    } catch {
+      setOtpError("Network error. Please check your connection.");
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  /* ── Resend OTP ── */
+  const handleResend = async () => {
+    setOtpError("");
+    const { first, last } = splitName(fullName);
+    const { ok, data } = await apiPost("/customer/auth/signup", {
+      email, first_name: first, last_name: last, password,
+    });
+    if (ok) {
+      const returnedOtp = (data.otp || data.OTP || data.code) as string | undefined;
+      if (returnedOtp) setDevOtp(String(returnedOtp));
+      setOtp(["", "", "", "", "", ""]);
+    } else {
+      setOtpError("Could not resend OTP. Please try again.");
     }
   };
 
@@ -324,36 +362,52 @@ export default function LoginClient() {
       <div className="flex-1 flex flex-col justify-center items-center px-5 sm:px-10 py-10 bg-white">
         <div className="w-full max-w-[400px]" style={{ animation: "slideUp .45s cubic-bezier(.16,1,.3,1) both" }}>
 
-          {/* ══ STEP: LOGIN ══ */}
-          {step === "login" && (
+          {/* ══ STEP: SIGNUP FORM ══ */}
+          {step === "form" && (
             <>
               <div className="mb-8">
                 <h1 className="text-[27px] sm:text-[30px] font-[900] text-gray-900 tracking-tight leading-tight">
-                  Welcome back
+                  Create account
                 </h1>
                 <p className="text-gray-400 text-[14px] font-[500] mt-1.5">
-                  Sign in to your account
+                  Join us — it&apos;s free and takes 30 seconds.
                 </p>
               </div>
 
-              <form onSubmit={handleLogin} className="space-y-5">
+              <form onSubmit={handleSignup} className="space-y-4">
+                {/* Full Name */}
+                <InputRow
+                  label="Full Name"
+                  type="text"
+                  value={fullName}
+                  onChange={setFullName}
+                  placeholder="Riya Sharma"
+                  icon={<HiOutlineUser size={18} strokeWidth={1.8} />}
+                  autoComplete="name"
+                  hint="Enter your first and last name"
+                />
+
+                {/* Email */}
                 <InputRow
                   label="Email Address"
                   type="email"
-                  value={identifier}
-                  onChange={setIdentifier}
+                  value={email}
+                  onChange={setEmail}
                   placeholder="you@example.com"
                   icon={<HiOutlineEnvelope size={18} strokeWidth={1.8} />}
                   autoComplete="email"
                 />
+
+
+                {/* Password */}
                 <InputRow
                   label="Password"
                   type={showPw ? "text" : "password"}
                   value={password}
                   onChange={setPassword}
-                  placeholder="Enter your password"
+                  placeholder="Min. 6 characters"
                   icon={<HiOutlineLockClosed size={18} strokeWidth={1.8} />}
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   hint="🔒 Password is case-sensitive"
                   suffix={
                     <button type="button" onClick={() => setShowPw((v) => !v)}
@@ -363,26 +417,19 @@ export default function LoginClient() {
                   }
                 />
 
-                <div className="flex justify-end">
-                  <button type="button" onClick={() => { setStep("forgot"); setForgotId(identifier); }}
-                    className="text-[12px] font-[700] text-gray-500 hover:text-gray-900 underline-offset-2 hover:underline transition-colors">
-                    Forgot password?
-                  </button>
-                </div>
-
-                <ErrorBox msg={loginError} />
-                <PrimaryBtn label="Sign In" loading={loginLoading} />
+                <ErrorBox msg={formError} />
+                <PrimaryBtn label="Create Account" loading={formLoading} />
               </form>
 
               <p className="text-center text-[13px] text-gray-400 mt-6">
-                Don&apos;t have an account?{" "}
-                <Link href="/signup" className="font-[800] text-gray-900 hover:underline underline-offset-2">
-                  Sign up
+                Already have an account?{" "}
+                <Link href="/login" className="font-[800] text-gray-900 hover:underline underline-offset-2">
+                  Sign in
                 </Link>
               </p>
 
               <p className="text-center text-[11px] text-gray-400 mt-6 leading-relaxed">
-                By continuing, you agree to our{" "}
+                By creating an account, you agree to our{" "}
                 <Link href="/terms" className="text-gray-700 font-[700] underline-offset-2 hover:underline">Terms of Use</Link>{" "}
                 and{" "}
                 <Link href="/privacy" className="text-gray-700 font-[700] underline-offset-2 hover:underline">Privacy Policy</Link>
@@ -390,8 +437,8 @@ export default function LoginClient() {
 
               <div className="mt-8 pt-6 border-t border-gray-100 flex items-center justify-center gap-6">
                 {[
-                  { icon: <HiOutlineShieldCheck size={14} />, label: "Secure login" },
-                  { icon: <HiOutlineLockClosed size={14} />, label: "Encrypted" },
+                  { icon: <HiOutlineShieldCheck size={14} />, label: "Secure signup" },
+                  { icon: <HiOutlineCheckCircle size={14} />, label: "OTP verified" },
                 ].map((t) => (
                   <div key={t.label} className="flex items-center gap-1.5 text-[11px] font-[700] text-gray-400 uppercase tracking-wide">
                     {t.icon}{t.label}
@@ -401,135 +448,77 @@ export default function LoginClient() {
             </>
           )}
 
-          {/* ══ STEP: FORGOT PASSWORD ══ */}
-          {step === "forgot" && (
+          {/* ══ STEP: OTP VERIFICATION ══ */}
+          {step === "otp" && (
             <>
-              <button type="button" onClick={() => setStep("login")}
+              <button type="button" onClick={() => setStep("form")}
                 className="flex items-center gap-1.5 text-[13px] font-[600] text-gray-400 hover:text-gray-800 mb-8 transition-colors">
-                <HiArrowLeft size={15} /> Back to login
+                ← Change details
               </button>
 
               <div className="mb-8">
                 <h1 className="text-[27px] font-[900] text-gray-900 tracking-tight leading-tight">
-                  Forgot password?
+                  Verify your email
                 </h1>
                 <p className="text-gray-400 text-[14px] font-[500] mt-1.5">
-                  Enter your email and we&apos;ll send reset instructions.
+                  We sent a 6-digit OTP to{" "}
+                  <span className="font-[800] text-gray-800">{email}</span>
                 </p>
               </div>
 
-              <form onSubmit={handleForgot} className="space-y-5">
-                <InputRow
-                  label="Email Address"
-                  type="email"
-                  value={forgotId}
-                  onChange={setForgotId}
-                  placeholder="you@example.com"
-                  icon={<HiOutlineEnvelope size={18} strokeWidth={1.8} />}
-                  autoComplete="email"
-                />
-                <SuccessBox msg={forgotSuccess} />
-                <ErrorBox msg={forgotError} />
-                <PrimaryBtn label="Send Reset Link" loading={forgotLoading} />
-              </form>
-
-              {/* Manual token entry (for dev/test) */}
-              {forgotSuccess && !resetToken && (
-                <div className="mt-5 space-y-2">
-                  <p className="text-[11px] font-[800] text-gray-500 uppercase tracking-[0.13em]">
-                    Have a reset token?
-                  </p>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={resetToken}
-                      onChange={(e) => setResetToken(e.target.value)}
-                      placeholder="Paste token here"
-                      className="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-[14px] font-[500] text-gray-900 focus:outline-none focus:border-orange-400"
-                    />
-                    <button type="button" onClick={() => setStep("reset")} disabled={!resetToken}
-                      className="px-4 py-2.5 rounded-xl text-[13px] font-[800] text-black disabled:opacity-40"
-                      style={{ background: HERO_BG }}>
-                      Go
-                    </button>
-                  </div>
+              {/* Dev mode OTP hint */}
+              {devOtp && (
+                <div className="mb-4 rounded-xl px-4 py-3 text-[13px] font-[600] text-amber-700 bg-amber-50 border border-amber-200">
+                  Dev mode OTP: <span className="font-[900] tracking-widest">{devOtp}</span>
                 </div>
               )}
-            </>
-          )}
 
-          {/* ══ STEP: RESET PASSWORD ══ */}
-          {step === "reset" && (
-            <>
-              <button type="button" onClick={() => setStep("forgot")}
-                className="flex items-center gap-1.5 text-[13px] font-[600] text-gray-400 hover:text-gray-800 mb-8 transition-colors">
-                <HiArrowLeft size={15} /> Back
-              </button>
-
-              <div className="mb-8">
-                <h1 className="text-[27px] font-[900] text-gray-900 tracking-tight leading-tight">
-                  Reset password
-                </h1>
-                <p className="text-gray-400 text-[14px] font-[500] mt-1.5">
-                  Enter your reset token and choose a new password.
-                </p>
-              </div>
-
-              <form onSubmit={handleReset} className="space-y-5">
-                {/* Token field — pre-filled from API response or user-pasted */}
+              <form onSubmit={handleVerifyOtp} className="space-y-6">
                 <div>
-                  <p className="text-[11px] font-[800] text-gray-500 uppercase tracking-[0.13em] mb-2">Reset Token</p>
-                  <input
-                    type="text"
-                    value={resetToken}
-                    onChange={(e) => setResetToken(e.target.value)}
-                    placeholder="Your reset token"
-                    required
-                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-[14px] font-[500] text-gray-900 focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all"
-                  />
+                  <p className="text-[11px] font-[800] text-gray-500 uppercase tracking-[0.13em] mb-3">
+                    Enter 6-digit OTP
+                  </p>
+                  <OtpBoxes otp={otp} onChange={setOtp} />
                 </div>
 
-                <InputRow
-                  label="New Password"
-                  type={showNewPw ? "text" : "password"}
-                  value={newPassword}
-                  onChange={setNewPassword}
-                  placeholder="Min. 6 characters"
-                  icon={<HiOutlineLockClosed size={18} strokeWidth={1.8} />}
-                  autoComplete="new-password"
-                  hint="🔒 Password is case-sensitive"
-                  suffix={
-                    <button type="button" onClick={() => setShowNewPw((v) => !v)}
-                      className="p-1 text-gray-400 hover:text-gray-700 transition-colors" tabIndex={-1}>
-                      {showNewPw ? <HiOutlineEyeSlash size={17} /> : <HiOutlineEye size={17} />}
-                    </button>
-                  }
-                />
+                <ErrorBox msg={otpError} />
+                <PrimaryBtn label="Verify & Continue" loading={otpLoading} />
 
-                <ErrorBox msg={resetError} />
-                <PrimaryBtn label="Reset Password" loading={resetLoading} />
+                <p className="text-center text-[13px] text-gray-400">
+                  Didn&apos;t receive it?{" "}
+                  <button type="button" onClick={handleResend}
+                    className="font-[800] text-gray-900 hover:underline">
+                    Resend OTP
+                  </button>
+                </p>
               </form>
             </>
           )}
 
-          {/* ══ STEP: RESET SUCCESS ══ */}
-          {step === "reset-success" && (
+          {/* ══ STEP: SUCCESS ══ */}
+          {step === "success" && (
             <div className="text-center py-6">
               <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-                style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
-                <HiOutlineCheckCircle size={32} className="text-white" />
+                style={{ background: HERO_BG }}>
+                <HiOutlineCheckCircle size={32} className="text-black" />
               </div>
               <h1 className="text-[27px] font-[900] text-gray-900 tracking-tight leading-tight mb-2">
-                Password reset!
+                Welcome, {fullName.split(" ")[0]}! 🎉
               </h1>
               <p className="text-gray-400 text-[14px] font-[500] mb-8">
-                Your password has been updated successfully. You can now log in with your new password.
+                Your account is ready. Start exploring the latest drops.
               </p>
-              <button type="button" onClick={() => { setStep("login"); setPassword(""); setNewPassword(""); setResetToken(""); }}
+              <button type="button" onClick={() => router.push("/")}
                 className="w-full flex items-center justify-center gap-2 py-4 rounded-xl text-[13px] font-[900] uppercase tracking-[0.14em] text-black transition-all duration-200 hover:-translate-y-0.5"
                 style={{ background: HERO_BG, boxShadow: "0 6px 22px rgba(255,140,66,0.45)" }}>
-                Back to Login <HiChevronRight size={16} />
+                Start Shopping <HiChevronRight size={16} />
               </button>
+              <p className="text-center text-[13px] text-gray-400 mt-4">
+                or{" "}
+                <Link href="/login" className="font-[800] text-gray-900 hover:underline underline-offset-2">
+                  go to login
+                </Link>
+              </p>
             </div>
           )}
 
@@ -546,3 +535,4 @@ export default function LoginClient() {
     </div>
   );
 }
+

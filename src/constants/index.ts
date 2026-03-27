@@ -12,7 +12,7 @@ export const ROUTES = {
     CONTACT: "/contact",
     SHOP: "/shop",
     CART: "/cart",
-    ACCOUNT: "/account",
+    ACCOUNT: "/login",
     ADMIN: {
         ROOT: "/admin",
         LOGIN: "/admin/login",
