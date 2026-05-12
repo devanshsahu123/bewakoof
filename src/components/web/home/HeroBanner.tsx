@@ -1,166 +1,142 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
+import { motion, AnimatePresence } from "framer-motion";
+import { HiArrowRight, HiArrowLeft } from "react-icons/hi2";
 import { bannerSlides } from "@/data/banners";
-
-const AUTO_PLAY_MS = 4500;
 
 export default function HeroBanner() {
   const [current, setCurrent] = useState(0);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const total = bannerSlides.length;
+  const [direction, setDirection] = useState(0);
 
-  const goTo = useCallback((idx: number) => setCurrent(idx), []);
-  const next = useCallback(() => goTo((current + 1) % total), [current, goTo, total]);
-  const prev = useCallback(() => goTo((current - 1 + total) % total), [current, goTo, total]);
+  const next = () => {
+    setDirection(1);
+    setCurrent((prev) => (prev + 1) % bannerSlides.length);
+  };
+
+  const prev = () => {
+    setDirection(-1);
+    setCurrent((prev) => (prev - 1 + bannerSlides.length) % bannerSlides.length);
+  };
 
   useEffect(() => {
-    timerRef.current = setTimeout(next, AUTO_PLAY_MS);
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [current, next]);
+    const timer = setInterval(next, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const slide = bannerSlides[current];
 
   return (
-    <div className="w-full relative overflow-hidden select-none">
+    <section className="relative w-full h-[100vh] overflow-hidden bg-black">
+      <AnimatePresence initial={false} custom={direction}>
+        <motion.div
+          key={current}
+          custom={direction}
+          initial={{ opacity: 0, scale: 1.1 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1] }}
+          className="absolute inset-0"
+        >
+          {/* Background Image */}
+          <div className="relative w-full h-full">
+            <Image
+              src={slide.heroImage}
+              alt={slide.headline.join(" ")}
+              fill
+              className="object-cover object-center"
+              priority
+            />
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-black/30" />
+          </div>
 
-      {/* ── Sliding Track — all slides side by side ── */}
-      <div
-        className="flex transition-transform duration-700 ease-[cubic-bezier(0.77,0,0.18,1)]"
-        style={{ transform: `translateX(-${current * 100}%)` }}
-      >
-        {bannerSlides.map((slide) => (
-          <div
-            key={slide.id}
-            className="relative w-full shrink-0 overflow-hidden"
-            style={{ aspectRatio: "18/5" }}
-          >
-            {/* Layer 0: gradient bg */}
-            <div className="absolute inset-0 z-0"
-              style={{ background: `linear-gradient(135deg, ${slide.bgFrom}, ${slide.bgTo})` }} />
-
-            {/* Layer 1: hero image */}
-            <div className="absolute inset-0 z-[1]">
-              <Image
-                src={slide.heroImage}
-                alt={slide.headline.join(" ")}
-                fill
-                className="object-contain object-center"
-                priority
-                unoptimized
-              />
-            </div>
-
-            {/* Layer 2: left-to-right dark overlay for text legibility (sweet spot) */}
-            <div className="absolute inset-0 z-[2]" style={{
-              background: `linear-gradient(to right,
-                ${slide.bgFrom}d9 0%,   /* 85% opacity */
-                ${slide.bgFrom}99 22%,   /* 60% opacity */
-                ${slide.bgFrom}40 45%,   /* 25% opacity */
-                transparent 68%)`,       /* smooth blend */
-            }} />
-
-            {/* Layer 3: content — left center */}
-            <div
-              className="absolute inset-0 z-[3] flex flex-col justify-center items-start text-left"
-              style={{ paddingLeft: "5vw" }}
+          {/* Content */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+            <motion.span
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="text-white text-[12px] md:text-[14px] font-bold uppercase tracking-[0.5em] mb-6"
             >
-              {/* Tag badge */}
-              <span
-                className="inline-block font-[800] uppercase rounded-full"
-                style={{
-                  fontSize: "0.8vw",
-                  letterSpacing: "0.2em",
-                  padding: "0.4vw 1vw",
-                  marginBottom: "1.2vw",
-                  color: slide.accentColor,
-                  backgroundColor: `${slide.accentColor}22`,
-                  border: `1px solid ${slide.accentColor}55`,
-                }}
-              >
-                {slide.tag}
-              </span>
+              {slide.tag}
+            </motion.span>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 1 }}
+              className="mb-8"
+            >
+              {slide.headline.map((line, idx) => (
+                <h2 
+                  key={idx}
+                  className="text-white text-[clamp(3rem,10vw,8rem)] font-serif italic leading-[1] uppercase tracking-[-0.02em]"
+                >
+                  {line}
+                </h2>
+              ))}
+            </motion.div>
 
-              {/* Category pills */}
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5vw", marginBottom: "1.5vw" }}>
-                {slide.categories.map((cat) => (
-                  <Link
-                    key={cat.href}
-                    href={cat.href}
-                    className="font-[700] uppercase hover:opacity-70 transition-opacity"
-                    style={{
-                      fontSize: "0.8vw",
-                      letterSpacing: "0.15em",
-                      padding: "0.3vw 0.7vw",
-                      color: "#fff",
-                      backgroundColor: "rgba(255,255,255,0.12)",
-                      borderRadius: "0.3vw",
-                      border: "1px solid rgba(255,255,255,0.2)",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {cat.label}
-                  </Link>
-                ))}
-              </div>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8, duration: 0.8 }}
+              className="text-white/80 text-[16px] md:text-[18px] max-w-xl font-light tracking-wide mb-10"
+            >
+              {slide.subline}
+            </motion.p>
 
-              {/* Shop Now CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1, duration: 0.8 }}
+            >
               <Link
                 href={slide.ctaHref}
-                className="inline-flex items-center gap-1 font-[800] uppercase rounded-full hover:opacity-90 hover:scale-105 transition-all"
-                style={{
-                  fontSize: "0.95vw",
-                  letterSpacing: "0.18em",
-                  padding: "0.6vw 1.6vw",
-                  backgroundColor: slide.accentColor,
-                  color: "#000",
-                  whiteSpace: "nowrap",
-                }}
+                className="group relative inline-flex items-center gap-4 px-12 py-5 bg-white text-primary text-[12px] font-bold uppercase tracking-[0.2em] overflow-hidden transition-all hover:pr-16"
               >
-                {slide.ctaLabel}
-                <HiChevronRight style={{ width: "1.2vw", height: "1.2vw" }} />
+                <span className="relative z-10">{slide.ctaLabel}</span>
+                <HiArrowRight className="relative z-10 transition-transform group-hover:translate-x-2" />
+                <div className="absolute inset-0 bg-accent translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
               </Link>
-            </div>
+            </motion.div>
           </div>
-        ))}
-      </div>
+        </motion.div>
+      </AnimatePresence>
 
-      {/* ── Prev / Next arrows ── */}
-      {([
-        { fn: prev, pos: "left-2", Icon: HiChevronLeft, label: "Previous" },
-        { fn: next, pos: "right-2", Icon: HiChevronRight, label: "Next" },
-      ] as const).map(({ fn, pos, Icon, label }) => (
+      {/* Navigation Controls */}
+      <div className="absolute bottom-12 right-12 flex gap-4 z-20">
         <button
-          key={label}
-          type="button"
-          onClick={fn}
-          aria-label={label}
-          className={`absolute ${pos} top-1/2 -translate-y-1/2 z-20 rounded-full bg-white/10 hover:bg-white/25 border border-white/20 flex items-center justify-center text-white transition-all backdrop-blur-sm`}
-          style={{ cursor: "pointer", width: "clamp(22px, 2.8vw, 40px)", height: "clamp(22px, 2.8vw, 40px)" }}
+          onClick={prev}
+          className="p-4 border border-white/20 text-white hover:bg-white hover:text-primary transition-all backdrop-blur-sm"
         >
-          <Icon size={15} />
+          <HiArrowLeft size={20} />
         </button>
-      ))}
+        <button
+          onClick={next}
+          className="p-4 border border-white/20 text-white hover:bg-white hover:text-primary transition-all backdrop-blur-sm"
+        >
+          <HiArrowRight size={20} />
+        </button>
+      </div>
 
-      {/* ── Dot indicators ── */}
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5">
-        {bannerSlides.map((_, i) => (
+      {/* Progress Indicators */}
+      <div className="absolute bottom-12 left-12 flex items-center gap-4 z-20">
+        {bannerSlides.map((_, idx) => (
           <button
-            key={i}
-            type="button"
-            onClick={() => goTo(i)}
-            aria-label={`Slide ${i + 1}`}
-            className="rounded-full transition-all duration-300"
-            style={{
-              cursor: "pointer",
-              width: i === current ? "clamp(14px, 2vw, 26px)" : "clamp(4px, 0.6vw, 7px)",
-              height: "clamp(4px, 0.6vw, 7px)",
-              backgroundColor: i === current ? "#fff" : "rgba(255,255,255,0.35)",
-            }}
-          />
+            key={idx}
+            onClick={() => setCurrent(idx)}
+            className="group py-4"
+          >
+            <div className={`h-[1px] transition-all duration-700 ${
+              idx === current ? "w-16 bg-accent" : "w-8 bg-white/30 group-hover:bg-white/60"
+            }`} />
+          </button>
         ))}
       </div>
-    </div>
+    </section>
   );
 }
