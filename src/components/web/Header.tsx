@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   HiOutlineMagnifyingGlass,
   HiOutlineHeart,
@@ -22,12 +22,28 @@ const mainNavLinks = [
   { label: "MOBILE COVERS", href: "/shop/mobile-covers" },
 ];
 
+const DUMMY_SUGGESTIONS = [
+  "Men's Oversized T-Shirts",
+  "Women's Printed Kurta",
+  "Cotton Joggers for Men",
+  "Summer Dresses for Women",
+  "Anime Collection",
+  "Mobile Covers for iPhone 15",
+  "Winter Hoodies",
+  "Official Disney Merchandise",
+  "Cargo Pants",
+  "Graphic Tees",
+];
+
 /* ── Reusable: Profile dropdown for desktop navbar ── */
 function AuthNavItem() {
   const { isAuthenticated, user, clearAuth } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  const isAuthPage = pathname === "/login" || pathname === "/signup";
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -41,6 +57,7 @@ function AuthNavItem() {
   }, []);
 
   if (!isAuthenticated) {
+    if (isAuthPage) return null;
     return (
       <Link
         href="/login"
@@ -134,6 +151,9 @@ function AuthNavItem() {
 function MobileDrawerHeader({ closeMenu }: { closeMenu: () => void }) {
   const { isAuthenticated, user, clearAuth } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+
+  const isAuthPage = pathname === "/login" || pathname === "/signup";
 
   const handleLogout = () => {
     clearAuth();
@@ -164,15 +184,17 @@ function MobileDrawerHeader({ closeMenu }: { closeMenu: () => void }) {
           </div>
         </div>
       ) : (
-        <Link href="/login" className="flex items-center gap-3" onClick={closeMenu}>
-          <div className="bg-white p-2 rounded-full border border-gray-200">
-            <HiOutlineUser size={24} className="text-gray-600" />
-          </div>
-          <div>
-            <p className="text-[14px] font-[700] text-black leading-tight">Welcome Guest</p>
-            <p className="text-[12px] font-[500] text-gray-500 hover:text-black">Login / Sign Up</p>
-          </div>
-        </Link>
+        !isAuthPage && (
+          <Link href="/login" className="flex items-center gap-3" onClick={closeMenu}>
+            <div className="bg-white p-2 rounded-full border border-gray-200">
+              <HiOutlineUser size={24} className="text-gray-600" />
+            </div>
+            <div>
+              <p className="text-[14px] font-[700] text-black leading-tight">Welcome Guest</p>
+              <p className="text-[12px] font-[500] text-gray-500 hover:text-black">Login / Sign Up</p>
+            </div>
+          </Link>
+        )
       )}
       <button
         onClick={closeMenu}
@@ -188,8 +210,11 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const router = useRouter();
   const { cartCount } = useCart();
+  const searchRef = useRef<HTMLDivElement>(null);
 
   // Handle scroll for sticky header shadow
   useEffect(() => {
@@ -212,12 +237,39 @@ export default function Header() {
     };
   }, [isMobileMenuOpen]);
 
+  // Filter suggestions based on query
+  useEffect(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (query.length > 1) {
+      const filtered = DUMMY_SUGGESTIONS.filter(item => 
+        item.toLowerCase().includes(query)
+      );
+      setSuggestions(filtered);
+      setShowSuggestions(true);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [searchQuery]);
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   // Handle search submission
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const q = searchQuery.trim();
     if (!q) return;
     router.push(`/search?q=${encodeURIComponent(q)}`);
+    setShowSuggestions(false);
     setIsMobileMenuOpen(false); // Close menu if mobile
   };
 
@@ -243,9 +295,9 @@ export default function Header() {
 
         {/* Main Header Row */}
         <div className="mx-auto max-w-[1400px] px-4 md:px-6">
-          <div className="flex h-[60px] md:h-[72px] items-center justify-between">
+          <div className="flex h-[60px] md:h-[72px] items-center justify-between gap-4">
             {/* Left Section: Menu & Logo */}
-            <div className="flex items-center gap-3 lg:gap-8 h-full">
+            <div className="flex items-center gap-3 lg:gap-8 h-full shrink-0">
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
@@ -277,10 +329,9 @@ export default function Header() {
               </nav>
             </div>
 
-            {/* Right Section: Search & Icons */}
-            <div className="flex items-center gap-4 lg:gap-6">
-              {/* Desktop Search Bar */}
-              <form onSubmit={handleSearch} className="hidden lg:flex relative w-[320px] xl:w-[450px]">
+            {/* Center Section: Search Bar (Desktop) */}
+            <div className="hidden lg:flex flex-1 justify-center max-w-[600px] relative" ref={searchRef}>
+              <form onSubmit={handleSearch} className="w-full relative">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
                   <HiOutlineMagnifyingGlass size={18} />
                 </div>
@@ -288,11 +339,38 @@ export default function Header() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => searchQuery.length > 1 && setShowSuggestions(true)}
                   placeholder="Search by product, category or collection"
                   className="w-full bg-[#eaeaea] text-black text-[13px] rounded-md pl-10 pr-4 py-2.5 outline-none focus:bg-white focus:ring-1 focus:ring-gray-300 transition-colors placeholder:text-gray-500"
                 />
+                
+                {/* Suggestions Dropdown */}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-white rounded-lg shadow-xl border border-gray-100 z-[100] overflow-hidden">
+                    <div className="py-2">
+                      {suggestions.map((item, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => {
+                            setSearchQuery(item);
+                            setShowSuggestions(false);
+                            router.push(`/search?q=${encodeURIComponent(item)}`);
+                          }}
+                          className="w-full text-left px-4 py-2 text-[13px] hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                        >
+                          <HiOutlineMagnifyingGlass size={14} className="text-gray-400" />
+                          <span className="text-gray-700">{item}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </form>
+            </div>
 
+            {/* Right Section: Icons */}
+            <div className="flex items-center gap-4 lg:gap-6 shrink-0">
               {/* Vertical Divider */}
               <div className="hidden lg:block w-[1px] h-5 bg-gray-300 mx-1"></div>
 

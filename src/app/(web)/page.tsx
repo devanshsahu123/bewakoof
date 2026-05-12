@@ -1,6 +1,5 @@
 import HeroBanner from "@/components/web/home/HeroBanner";
-import ProductSection from "@/components/web/home/ProductSection";
-import { denimProducts } from "@/data/products";
+import HomeSectionsRenderer from "@/components/web/home/HomeSectionsRenderer";
 
 export default function HomePage() {
   return (
@@ -8,13 +7,8 @@ export default function HomePage() {
       {/* Auto-scroll Hero Banner */}
       <HeroBanner />
 
-      {/* Denim Verse Product Section */}
-      <ProductSection
-        title="Denim Verse"
-        products={denimProducts}
-        seeAllHref="/shop/men?category=jeans"
-        bgColor="#fdf9ec"
-      />
+      {/* Dynamic Home Sections */}
+      <HomeSectionsRenderer />
     </>
   );
 }
