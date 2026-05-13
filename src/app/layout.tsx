@@ -18,15 +18,19 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "Noir";
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "SIYAPAA";
 
 export const metadata: Metadata = {
   title: {
     default: APP_NAME,
     template: `%s | ${APP_NAME}`,
   },
-  description: `Premium Luxury Fashion – ${APP_NAME}`,
+  description: `Luxury Indian Jewelry – ${APP_NAME}`,
 };
+
+import Header from "@/components/web/Header";
+import Footer from "@/components/web/Footer";
+import MobileNav from "@/components/web/MobileNav";
 
 export default function RootLayout({
   children,
@@ -37,7 +41,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} ${playfair.variable} ${geistMono.variable}`}>
         <AuthProvider>
+          <Header />
           {children}
+          <Footer />
+          <MobileNav />
         </AuthProvider>
       </body>
     </html>

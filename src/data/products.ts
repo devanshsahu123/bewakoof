@@ -1,273 +1,104 @@
-// Mock product data for homepage sections
-
 export interface Product {
-    id: string;
-    brand: string;
-    name: string;
-    price: number;
-    mrp: number;
-    rating: number;
-    ratingCount?: number;
-    image: string;
-    tag?: string;
-    href: string;
+  id: string;
+  name: string;
+  price: number;
+  oldPrice?: number;
+  image: string;
+  hoverImage: string;
+  category: string;
+  material: string;
+  tag?: string;
+  rating: number;
+  reviews: number;
+  description: string;
+  details: string[];
 }
 
-export interface SizeOption {
-    label: string;
-    stock: number; // 0 = out of stock
-    stockLabel?: string; // "6 left", "7 left" etc.
-}
-
-export interface ProductHighlight {
-    label: string;
-    value: string;
-}
-
-export interface ProductOffer {
-    icon: string;
-    title: string;
-    subtitle: string;
-    href: string;
-}
-
-export interface ProductDetail extends Product {
-    images: string[];        // multiple gallery images
-    badge?: string;          // "OVERSIZED FIT"
-    fabricBadge?: string;    // "Premium Dense Fabric"
-    savingsPrice?: number;   // "Get it for as low as ₹X"
-    sizes: SizeOption[];
-    highlights: ProductHighlight[];
-    description: string;
-    offers: ProductOffer[];
-    returnPolicy: string;
-    breadcrumb: { label: string; href: string }[];
-}
-
-const DEMO_IMAGE = "https://images.bewakoof.com/t1080/men-s-black-venom-graphic-printed-oversized-t-shirt-651229-1731501911-1.jpg";
-
-export const denimProducts: Product[] = [
-    {
-        id: "denim-1",
-        brand: `${process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}®`,
-        name: "Men's Blue Washed Super Baggy Fit Distressed Jeans",
-        price: 1499,
-        mrp: 3299,
-        rating: 4.4,
-        ratingCount: 1823,
-        image: DEMO_IMAGE,
-        tag: "SUPER BAGGY FIT",
-        href: "/product/mens-blue-baggy-jeans",
-    },
-    {
-        id: "denim-2",
-        brand: `${process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}®`,
-        name: "Men's Grey Baggy Fit Washed Cargo Mid-Rise Jeans",
-        price: 1499,
-        mrp: 4099,
-        rating: 4.4,
-        ratingCount: 982,
-        image: DEMO_IMAGE,
-        tag: "BAGGY FIT",
-        href: "/product/mens-grey-cargo-jeans",
-    },
-    {
-        id: "denim-3",
-        brand: `${process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}®`,
-        name: "Men's Brown Super Baggy Fit Mid-Rise Jeans",
-        price: 1499,
-        mrp: 3399,
-        rating: 4.4,
-        ratingCount: 1201,
-        image: DEMO_IMAGE,
-        tag: "SUPER BAGGY FIT",
-        href: "/product/mens-brown-baggy-jeans",
-    },
-    {
-        id: "denim-4",
-        brand: `${process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}®`,
-        name: "Men's Brown Washed Super Baggy Fit Mid-Rise Jeans",
-        price: 1499,
-        mrp: 3499,
-        rating: 4.5,
-        ratingCount: 2340,
-        image: DEMO_IMAGE,
-        tag: "SUPER BAGGY FIT",
-        href: "/product/mens-brown-washed-jeans",
-    },
-    {
-        id: "denim-5",
-        brand: `${process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}®`,
-        name: "Men's Beige Super Baggy Fit Mid-Rise Jeans",
-        price: 1499,
-        mrp: 3399,
-        rating: 4.5,
-        ratingCount: 876,
-        image: DEMO_IMAGE,
-        tag: "SUPER BAGGY FIT",
-        href: "/product/mens-beige-baggy-jeans",
-    },
-    {
-        id: "denim-6",
-        brand: `${process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}®`,
-        name: "Men's Black Super Baggy Fit Distressed Mid-Rise Jeans",
-        price: 1499,
-        mrp: 3299,
-        rating: 4.3,
-        ratingCount: 1455,
-        image: DEMO_IMAGE,
-        tag: "SUPER BAGGY FIT",
-        href: "/product/mens-black-distressed-jeans",
-    },
-    {
-        id: "denim-7",
-        brand: `${process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}®`,
-        name: "Men's Indigo Super Baggy Fit Washed Mid-Rise Jeans",
-        price: 1499,
-        mrp: 3499,
-        rating: 4.4,
-        ratingCount: 743,
-        image: DEMO_IMAGE,
-        tag: "SUPER BAGGY FIT",
-        href: "/product/mens-indigo-baggy-jeans",
-    },
+export const PRODUCTS: Product[] = [
+  {
+    id: "1",
+    name: "Regal Kundan Choker",
+    price: 125000,
+    oldPrice: 150000,
+    image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=1974&auto=format&fit=crop",
+    hoverImage: "https://images.unsplash.com/photo-1611085583191-a3b181a88401?q=80&w=1974&auto=format&fit=crop",
+    category: "necklaces",
+    material: "22K Gold • Kundan",
+    tag: "Selling Fast",
+    rating: 5.0,
+    reviews: 18,
+    description: "A masterpiece of traditional Indian artistry, this Kundan choker features hand-set stones in 22K pure gold.",
+    details: ["22K BIS Hallmarked Gold", "Handcrafted Kundan Work", "Adjustable Silk Thread Cord", "Authenticity Certificate Included"],
+  },
+  {
+    id: "2",
+    name: "Divine Pearl Drop Earrings",
+    price: 45000,
+    image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=1974&auto=format&fit=crop",
+    hoverImage: "https://images.unsplash.com/photo-1588444839799-eb6bd77c001c?q=80&w=1974&auto=format&fit=crop",
+    category: "earrings",
+    material: "18K Rose Gold • Pearls",
+    tag: "Limited Edition",
+    rating: 4.9,
+    reviews: 32,
+    description: "Elegant drop earrings featuring lustrous South Sea pearls suspended from 18K rose gold settings.",
+    details: ["18K BIS Hallmarked Rose Gold", "AAA Quality South Sea Pearls", "Secure Butterfly Clasp", "Gift Packaging Included"],
+  },
+  {
+    id: "3",
+    name: "Ethereal Diamond Band",
+    price: 85000,
+    image: "https://images.unsplash.com/photo-1605100804763-247f67b3f416?q=80&w=2070&auto=format&fit=crop",
+    hoverImage: "https://images.unsplash.com/photo-1598560912005-59a195bb1a31?q=80&w=1974&auto=format&fit=crop",
+    category: "rings",
+    material: "Platinum • VVS Diamonds",
+    tag: "Hallmarked",
+    rating: 5.0,
+    reviews: 12,
+    description: "A minimalist yet profound expression of commitment, featuring conflict-free VVS diamonds in platinum.",
+    details: ["950 Platinum Hallmarked", "0.5ct VVS1 Clarity Diamonds", "Comfort Fit Band", "GIA Certification Included"],
+  },
+  {
+    id: "4",
+    name: "Classic Gold Jhumkas",
+    price: 72000,
+    oldPrice: 85000,
+    image: "https://images.unsplash.com/photo-1630030538573-049079b74205?q=80&w=1974&auto=format&fit=crop",
+    hoverImage: "https://images.unsplash.com/photo-1635767798638-3e25273a8236?q=80&w=1974&auto=format&fit=crop",
+    category: "earrings",
+    material: "22K Yellow Gold",
+    tag: "Traditional",
+    rating: 4.8,
+    reviews: 56,
+    description: "Authentic temple-style jhumkas handcrafted in 22K yellow gold with intricate peacock motifs.",
+    details: ["22K BIS Hallmarked Gold", "Intricate Filigree Work", "Traditional Screw Back", "Lifetime Exchange Guarantee"],
+  },
+  {
+    id: "5",
+    name: "Stellar Diamond Necklace",
+    price: 350000,
+    image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2070&auto=format&fit=crop",
+    hoverImage: "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?q=80&w=2070&auto=format&fit=crop",
+    category: "necklaces",
+    material: "18K White Gold • Diamonds",
+    tag: "Bestseller",
+    rating: 5.0,
+    reviews: 8,
+    description: "A breathtaking statement piece featuring a cascade of brilliant-cut diamonds in 18K white gold.",
+    details: ["18K White Gold", "5.2ct Total Diamond Weight", "E-F Color, VVS Clarity", "Luxury Presentation Box"],
+  },
+  {
+    id: "6",
+    name: "Golden Temple Bangle",
+    price: 95000,
+    image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=2070&auto=format&fit=crop",
+    hoverImage: "https://images.unsplash.com/photo-1611085583191-a3b181a88401?q=80&w=1974&auto=format&fit=crop",
+    category: "bracelets",
+    material: "22K Gold • Ruby",
+    tag: "New Arrival",
+    rating: 4.7,
+    reviews: 15,
+    description: "A thick handcrafted gold bangle with floral motifs and Burmese rubies.",
+    details: ["22K BIS Hallmarked Gold", "Natural Untreated Rubies", "Openable Clasp", "Heritage Design"],
+  },
 ];
-
-// ── Detailed product data map keyed by slug ──────────────────────────────────
-
-const GALLERY_IMAGES = [
-    "https://images.bewakoof.com/t1080/men-s-black-venom-graphic-printed-oversized-t-shirt-651229-1731501911-1.jpg",
-    "https://images.bewakoof.com/t1080/men-s-black-venom-graphic-printed-oversized-t-shirt-651229-1729235299-3.jpg",
-    "https://images.bewakoof.com/t1080/men-s-black-venom-graphic-printed-oversized-t-shirt-651229-1729235304-4.jpg",
-    "https://images.bewakoof.com/t1080/men-s-black-venom-graphic-printed-oversized-t-shirt-651229-1729235308-5.jpg",
-    "https://images.bewakoof.com/t1080/men-s-black-venom-graphic-printed-oversized-t-shirt-651229-1729235312-6.jpg",
-    "https://images.bewakoof.com/t1080/men-s-black-venom-graphic-printed-oversized-t-shirt-651229-1734587867-10.jpg"
-];
-
-const DEFAULT_SIZES: SizeOption[] = [
-    { label: "S", stock: 6, stockLabel: "6 left" },
-    { label: "M", stock: 10 },
-    { label: "L", stock: 7, stockLabel: "7 left" },
-    { label: "XL", stock: 6, stockLabel: "6 left" },
-    { label: "2XL", stock: 10 },
-    { label: "3XL", stock: 0 },
-];
-
-const DEFAULT_HIGHLIGHTS: ProductHighlight[] = [
-    { label: "Design", value: "Graphic Print" },
-    { label: "Fit", value: "Oversized Fit" },
-    { label: "Neck", value: "Round Neck" },
-    { label: "Occasion", value: "Casual Wear" },
-    { label: "Sleeve Style", value: "Half Sleeve" },
-    { label: "Wash Care", value: "Machine wash as per tag" },
-];
-
-const DEFAULT_OFFERS: ProductOffer[] = [
-    {
-        icon: "🏷️",
-        title: "Buy 2 for ₹1199",
-        subtitle: "Auto applied offer",
-        href: "/offers",
-    },
-];
-
-export const productDetailsMap: Record<string, ProductDetail> = {
-    "mens-blue-baggy-jeans": {
-        id: "denim-1",
-        brand: `${process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}®`,
-        name: "Men's Blue Washed Super Baggy Fit Distressed Jeans",
-        price: 649,
-        mrp: 1299,
-        rating: 4.5,
-        ratingCount: 457,
-        image: GALLERY_IMAGES[0],
-        tag: "SUPER BAGGY FIT",
-        href: "/product/mens-blue-baggy-jeans",
-        badge: "OVERSIZED FIT",
-        fabricBadge: "Premium Dense Fabric",
-        savingsPrice: 600,
-        images: GALLERY_IMAGES,
-        sizes: DEFAULT_SIZES,
-        highlights: DEFAULT_HIGHLIGHTS,
-        description:
-            "This oversized graphic-print tee is crafted from premium dense cotton fabric that feels soft yet structured. Featuring a bold all-over print, drop shoulders, and a boxy silhouette, it's made for those who dress loud and mean it. Pair with baggy jeans for an effortlessly cool street-style look.",
-        offers: DEFAULT_OFFERS,
-        returnPolicy:
-            "Easy returns upto 15 days of delivery. Exchange available on select pincodes.",
-        breadcrumb: [
-            { label: "Home", href: "/" },
-            { label: "Topwear", href: "/shop/men" },
-            { label: "T-Shirts", href: "/shop/men" },
-        ],
-    },
-    "mens-grey-cargo-jeans": {
-        id: "denim-2",
-        brand: `${process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}®`,
-        name: "Men's Grey Baggy Fit Washed Cargo Mid-Rise Jeans",
-        price: 1299,
-        mrp: 4099,
-        rating: 4.4,
-        ratingCount: 982,
-        image: GALLERY_IMAGES[0],
-        tag: "BAGGY FIT",
-        href: "/product/mens-grey-cargo-jeans",
-        badge: "BAGGY FIT",
-        fabricBadge: "Heavy Denim",
-        savingsPrice: 1100,
-        images: GALLERY_IMAGES,
-        sizes: [
-            { label: "28", stock: 5, stockLabel: "5 left" },
-            { label: "30", stock: 10 },
-            { label: "32", stock: 8, stockLabel: "8 left" },
-            { label: "34", stock: 3, stockLabel: "3 left" },
-            { label: "36", stock: 0 },
-        ],
-        highlights: [
-            { label: "Design", value: "Solid with Cargo Pockets" },
-            { label: "Fit", value: "Baggy Fit" },
-            { label: "Rise", value: "Mid-Rise" },
-            { label: "Occasion", value: "Casual Wear" },
-            { label: "Closure", value: "Button & Zip" },
-            { label: "Wash Care", value: "Machine wash cold" },
-        ],
-        description:
-            "Elevate your street game with these washed grey cargo jeans. Featuring functional cargo pockets, a relaxed baggy silhouette, and premium washed denim, these are built to command attention. The mid-rise waist and straight-leg cut ensure max comfort all day.",
-        offers: DEFAULT_OFFERS,
-        returnPolicy:
-            "Easy returns upto 15 days of delivery. Exchange available on select pincodes.",
-        breadcrumb: [
-            { label: "Home", href: "/" },
-            { label: "Bottomwear", href: "/shop/men" },
-            { label: "Jeans", href: "/shop/men" },
-        ],
-    },
-    "mens-brown-baggy-jeans": {
-        id: "denim-3",
-        brand: `${process.env.NEXT_PUBLIC_APP_NAME || "Siyapaa"}®`,
-        name: "Men's Brown Super Baggy Fit Mid-Rise Jeans",
-        price: 1499,
-        mrp: 3399,
-        rating: 4.4,
-        ratingCount: 1201,
-        image: GALLERY_IMAGES[0],
-        tag: "SUPER BAGGY FIT",
-        href: "/product/mens-brown-baggy-jeans",
-        badge: "SUPER BAGGY FIT",
-        fabricBadge: "Stretch Denim",
-        savingsPrice: 1200,
-        images: GALLERY_IMAGES,
-        sizes: DEFAULT_SIZES,
-        highlights: DEFAULT_HIGHLIGHTS,
-        description:
-            "The ultimate slouchy statement piece. These brown mid-rise jeans come in a super baggy fit that's both comfortable and stylish. The stretch denim construction ensures freedom of movement while keeping the silhouette intact.",
-        offers: DEFAULT_OFFERS,
-        returnPolicy:
-            "Easy returns upto 15 days of delivery. Exchange available on select pincodes.",
-        breadcrumb: [
-            { label: "Home", href: "/" },
-            { label: "Bottomwear", href: "/shop/men" },
-            { label: "Jeans", href: "/shop/men" },
-        ],
-    },
-};
-

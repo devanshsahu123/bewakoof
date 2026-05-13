@@ -7,85 +7,87 @@ import { motion } from "framer-motion";
 const CATEGORIES = [
   {
     id: 1,
-    title: "The Atelier",
-    subtitle: "New Season Men",
-    image: "https://images.unsplash.com/photo-1516250442037-37562e14a09c?q=80&w=1974&auto=format&fit=crop",
-    href: "/shop/men",
+    title: "Signature Necklaces",
+    subtitle: "Heritage Collection",
+    image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=1974&auto=format&fit=crop",
+    href: "/shop/necklaces",
     span: "col-span-2 row-span-2",
   },
   {
     id: 2,
-    title: "Ethereal",
-    subtitle: "Womenswear",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1974&auto=format&fit=crop",
-    href: "/shop/women",
+    title: "Celestial Rings",
+    subtitle: "Modern Minimal",
+    image: "https://images.unsplash.com/photo-1605100804763-247f67b3f416?q=80&w=2070&auto=format&fit=crop",
+    href: "/shop/rings",
     span: "col-span-1 row-span-1",
   },
   {
     id: 3,
-    title: "Objects",
-    subtitle: "Accessories",
-    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1999&auto=format&fit=crop",
-    href: "/shop/accessories",
+    title: "Ethereal Earrings",
+    subtitle: "Evening Glow",
+    image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=1974&auto=format&fit=crop",
+    href: "/shop/earrings",
     span: "col-span-1 row-span-1",
   },
   {
     id: 4,
-    title: "Urban",
-    subtitle: "Streetwear",
-    image: "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=1974&auto=format&fit=crop",
-    href: "/shop/streetwear",
+    title: "Bridal Couture",
+    subtitle: "The Wedding Edit",
+    image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2070&auto=format&fit=crop",
+    href: "/shop/bridal",
     span: "col-span-2 row-span-1",
   },
 ];
 
 export default function FeaturedCategories() {
   return (
-    <section className="py-24 px-6 md:px-12 bg-white">
+    <section className="py-32 px-6 md:px-12 bg-secondary">
       <div className="max-w-[1800px] mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
           <div className="max-w-2xl">
-            <h3 className="text-[10px] uppercase tracking-[0.5em] text-accent font-bold mb-4">
-              Curated Selection
+            <h3 className="text-[10px] uppercase tracking-[0.5em] text-accent font-bold mb-6">
+              Curated Masterpieces
             </h3>
             <h2 className="text-4xl md:text-6xl font-serif leading-tight">
-              A Symphony of <br /> <span className="italic">Style & Substance</span>
+              An Ode to <br /> <span className="italic">Timeless Beauty</span>
             </h2>
           </div>
           <Link 
             href="/shop" 
-            className="text-[12px] font-bold uppercase tracking-[0.2em] border-b border-primary pb-2 hover:text-accent hover:border-accent transition-all"
+            className="text-[11px] font-bold uppercase tracking-[0.3em] border-b border-primary/20 pb-3 hover:text-accent hover:border-accent transition-all"
           >
-            View All Collections
+            Explore All Categories
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-4 h-[1000px] md:h-[800px]">
+        <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-6 h-[1200px] md:h-[900px]">
           {CATEGORIES.map((cat) => (
             <Link 
               key={cat.id} 
               href={cat.href}
-              className={`group relative overflow-hidden bg-secondary ${cat.span}`}
+              className={`group relative overflow-hidden bg-warm/20 ${cat.span}`}
             >
               <Image
                 src={cat.image}
                 alt={cat.title}
                 fill
-                className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                className="object-cover transition-transform duration-[1.5s] group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
+              {/* Luxury Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-40 group-hover:opacity-70 transition-opacity duration-700" />
               
-              <div className="absolute inset-0 p-8 flex flex-col justify-end">
-                <span className="text-white/70 text-[10px] uppercase tracking-[0.3em] mb-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+              <div className="absolute inset-0 p-10 flex flex-col justify-end">
+                <span className="text-white/80 text-[9px] uppercase tracking-[0.4em] mb-3 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-700">
                   {cat.subtitle}
                 </span>
-                <h4 className="text-white text-3xl font-serif italic tracking-wide group-hover:text-accent transition-colors">
+                <h4 className="text-white text-3xl font-serif italic tracking-wide group-hover:text-accent transition-colors duration-500">
                   {cat.title}
                 </h4>
+                <div className="w-0 group-hover:w-16 h-[1px] bg-accent mt-4 transition-all duration-700" />
               </div>
               
-              {/* Corner accent border on hover */}
-              <div className="absolute top-4 left-4 right-4 bottom-4 border border-white/0 group-hover:border-white/20 transition-all duration-700 pointer-events-none" />
+              {/* Inner Accent Frame */}
+              <div className="absolute top-6 left-6 right-6 bottom-6 border border-white/0 group-hover:border-white/10 transition-all duration-1000 pointer-events-none" />
             </Link>
           ))}
         </div>

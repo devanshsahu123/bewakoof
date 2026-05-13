@@ -1,4 +1,4 @@
-import { denimProducts, type Product } from "./products";
+import { PRODUCTS, type Product } from "./products";
 
 export type SectionType = "PRODUCT_CAROUSEL" | "CATEGORY_GRID" | "PROMO_GRID";
 
@@ -20,41 +20,25 @@ export interface HomeSectionConfig {
   seeAllHref?: string;
 }
 
-const DEMO_IMG = "https://images.bewakoof.com/t1080/men-s-black-venom-graphic-printed-oversized-t-shirt-651229-1731501911-1.jpg";
-
 export const homeSections: HomeSectionConfig[] = [
   {
-    id: "shop-by-category",
+    id: "jewelry-categories",
     type: "CATEGORY_GRID",
-    title: "Shop by Category",
+    title: "Signature Collections",
     categories: [
-      { id: "c1", label: "Oversized T-Shirts", image: DEMO_IMG, href: "/shop/men/oversized-t-shirts" },
-      { id: "c2", label: "Classic T-Shirts", image: DEMO_IMG, href: "/shop/men/t-shirts" },
-      { id: "c3", label: "Cargo Pants", image: DEMO_IMG, href: "/shop/men/cargo-pants" },
-      { id: "c4", label: "Joggers", image: DEMO_IMG, href: "/shop/men/joggers" },
-      { id: "c5", label: "Shorts", image: DEMO_IMG, href: "/shop/men/shorts" },
-      { id: "c6", label: "Boxers", image: DEMO_IMG, href: "/shop/men/boxers" },
+      { id: "c1", label: "Necklaces", image: PRODUCTS[0].image, href: "/shop/necklaces" },
+      { id: "c2", label: "Rings", image: PRODUCTS[2].image, href: "/shop/rings" },
+      { id: "c3", label: "Earrings", image: PRODUCTS[1].image, href: "/shop/earrings" },
+      { id: "c4", label: "Bracelets", image: PRODUCTS[5].image, href: "/shop/bracelets" },
     ],
-    bgColor: "#ffffff",
+    bgColor: "#FAF7F2",
   },
   {
-    id: "denim-verse-carousel",
+    id: "best-sellers-carousel",
     type: "PRODUCT_CAROUSEL",
-    title: "Denim Verse",
-    products: denimProducts,
-    bgColor: "#fdf9ec",
-    seeAllHref: "/shop/men?category=jeans",
-  },
-  {
-    id: "trending-merch",
-    type: "PROMO_GRID",
-    title: "The Official Merch Store",
-    categories: [
-      { id: "m1", label: "Disney", image: DEMO_IMG, href: "/shop/disney" },
-      { id: "m2", label: "Marvel", image: DEMO_IMG, href: "/shop/marvel" },
-      { id: "m3", label: "DC Comics", image: DEMO_IMG, href: "/shop/dc" },
-      { id: "m4", label: "Anime", image: DEMO_IMG, href: "/shop/anime" },
-    ],
+    title: "The Golden Selection",
+    products: PRODUCTS,
     bgColor: "#ffffff",
+    seeAllHref: "/shop",
   }
 ];

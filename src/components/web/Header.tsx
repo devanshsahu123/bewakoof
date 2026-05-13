@@ -4,15 +4,25 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Heart, ShoppingBag, User, Menu, X } from "lucide-react";
+import { Search, Heart, ShoppingBag, User, Menu, X, ChevronDown } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/store/authStore";
 
 const NAV_LINKS = [
-  { label: "Collection", href: "/shop" },
-  { label: "New Arrivals", href: "/new" },
-  { label: "Men", href: "/shop/men" },
-  { label: "Women", href: "/shop/women" },
+  { 
+    label: "Jewelry", 
+    href: "/shop",
+    submenu: [
+      { label: "Necklaces", href: "/shop/necklaces" },
+      { label: "Earrings", href: "/shop/earrings" },
+      { label: "Rings", href: "/shop/rings" },
+      { label: "Bracelets", href: "/shop/bracelets" },
+    ]
+  },
+  { label: "Bridal", href: "/shop/bridal" },
+  { label: "Gold", href: "/shop/gold" },
+  { label: "Silver", href: "/shop/silver" },
+  { label: "Collections", href: "/collections" },
 ];
 
 export default function Header() {
@@ -35,9 +45,9 @@ export default function Header() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 w-full z-[100] transition-all duration-500 ${
+        className={`fixed top-0 left-0 w-full z-[100] transition-all duration-700 ${
           isScrolled 
-            ? "bg-white/80 backdrop-blur-md border-b border-gray-100 py-3" 
+            ? "bg-white/90 backdrop-blur-md border-b border-warm/30 py-3" 
             : "bg-transparent py-6"
         }`}
       >
@@ -45,15 +55,33 @@ export default function Header() {
           {/* Left: Nav Links (Desktop) */}
           <nav className="hidden lg:flex items-center gap-8 flex-1">
             {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`text-[12px] font-bold uppercase tracking-[0.2em] transition-colors hover:text-accent ${
-                  isScrolled || !isHome ? "text-primary" : "text-white"
-                }`}
-              >
-                {link.label}
-              </Link>
+              <div key={link.label} className="group relative">
+                <Link
+                  href={link.href}
+                  className={`text-[11px] font-bold uppercase tracking-[0.25em] transition-colors hover:text-accent flex items-center gap-1.5 ${
+                    isScrolled || !isHome ? "text-primary" : "text-white"
+                  }`}
+                >
+                  {link.label}
+                  {link.submenu && <ChevronDown size={12} className="opacity-50" />}
+                </Link>
+                
+                {link.submenu && (
+                  <div className="absolute top-full left-0 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                    <div className="bg-white shadow-2xl border border-warm/20 p-6 min-w-[200px]">
+                      {link.submenu.map((sub) => (
+                        <Link 
+                          key={sub.label}
+                          href={sub.href}
+                          className="block text-[10px] font-bold uppercase tracking-widest text-primary hover:text-accent py-2.5 transition-colors"
+                        >
+                          {sub.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             ))}
           </nav>
 
@@ -69,13 +97,17 @@ export default function Header() {
 
           {/* Center: Logo */}
           <div className="flex-none text-center">
-            <Link href="/" className="group">
-              <h1 className={`text-2xl md:text-3xl font-serif tracking-[0.3em] uppercase transition-all ${
+            <Link href="/" className="group flex flex-col items-center">
+              <h1 className={`text-2xl md:text-4xl font-serif tracking-[0.4em] uppercase transition-all ${
                 isScrolled || !isHome ? "text-primary" : "text-white"
               }`}>
-                Noir
+                Siyapaa
               </h1>
-              <div className={`h-[1px] w-0 group-hover:w-full transition-all duration-500 bg-accent mx-auto mt-1`} />
+              <span className={`text-[8px] uppercase tracking-[0.5em] transition-all -mt-1 ${
+                isScrolled || !isHome ? "text-accent" : "text-white/60"
+              }`}>
+                Luxury Jewelry
+              </span>
             </Link>
           </div>
 
@@ -113,36 +145,40 @@ export default function Header() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-white flex flex-col"
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+            className="fixed inset-0 z-[200] bg-secondary flex flex-col"
           >
-            <div className="p-6 flex justify-end">
+            <div className="p-8 flex justify-between items-center border-b border-warm/20">
+              <h2 className="font-serif text-xl tracking-widest uppercase">Menu</h2>
               <button onClick={() => setIsMobileMenuOpen(false)}>
-                <X size={32} strokeWidth={1} className="text-primary" />
+                <X size={28} strokeWidth={1.5} className="text-primary" />
               </button>
             </div>
-            <nav className="flex flex-col items-center justify-center flex-1 gap-8">
+            
+            <nav className="flex flex-col p-8 gap-8">
               {NAV_LINKS.map((link, i) => (
                 <motion.div
                   key={link.href}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05 }}
                 >
                   <Link
                     href={link.href}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-3xl font-serif uppercase tracking-widest text-primary hover:text-accent transition-colors"
+                    className="text-2xl font-serif uppercase tracking-widest text-primary hover:text-accent transition-colors"
                   >
                     {link.label}
                   </Link>
                 </motion.div>
               ))}
             </nav>
-            <div className="p-12 text-center">
-               <p className="text-[10px] uppercase tracking-[0.3em] text-gray-400">© 2026 Noir Atelier</p>
+            
+            <div className="mt-auto p-12 text-center border-t border-warm/20">
+               <p className="text-[10px] uppercase tracking-[0.3em] text-gray-400">© 2026 Siyapaa Jewelers</p>
             </div>
           </motion.div>
         )}

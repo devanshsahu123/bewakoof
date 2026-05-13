@@ -3,56 +3,53 @@
 import HeroBanner from "@/components/web/home/HeroBanner";
 import FeaturedCategories from "@/components/web/home/FeaturedCategories";
 import BestSellers from "@/components/web/home/BestSellers";
+import BridalCollection from "@/components/web/home/BridalCollection";
 import SocialProof from "@/components/web/home/SocialProof";
 import LifestyleBanner from "@/components/web/home/LifestyleBanner";
 import Newsletter from "@/components/web/home/Newsletter";
 import { motion } from "framer-motion";
+import { ShieldCheck, Truck, RotateCcw, Gem } from "lucide-react";
 
 export default function HomePage() {
   return (
-    <main className="bg-white">
-      {/* 1. Fullscreen Hero Section */}
+    <main className="bg-secondary">
+      {/* 1. Fullscreen Jewelry Hero */}
       <HeroBanner />
 
-      {/* 2. Featured Collections Grid */}
-      <FeaturedCategories />
-
-      {/* 3. Best Sellers / Seasonal Carousel */}
-      <BestSellers />
-
-      {/* 4. Lifestyle Brand Statement */}
-      <LifestyleBanner />
-
-      {/* 5. Trust & Social Proof */}
-      <SocialProof />
-
-      {/* 6. Limited Collection / FOMO Trigger (Inline Example) */}
-      <section className="bg-primary py-24 px-6 text-center text-white overflow-hidden relative">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1 }}
-          viewport={{ once: true }}
-          className="relative z-10"
-        >
-          <h3 className="text-accent text-[10px] font-bold uppercase tracking-[0.6em] mb-6">Exclusive Drop</h3>
-          <h2 className="text-4xl md:text-6xl font-serif italic mb-8">The Midnight Capsule</h2>
-          <p className="text-gray-400 max-w-lg mx-auto font-light mb-12 tracking-wide uppercase text-[12px]">
-            Limited to 500 Pieces Globally. <br />
-            Next Drop in: 02d : 14h : 55m : 04s
-          </p>
-          <button className="px-12 py-5 border border-white hover:bg-white hover:text-primary transition-all text-[11px] font-bold uppercase tracking-widest">
-            Notify Me
-          </button>
-        </motion.div>
-        
-        {/* Background Text Decor */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none">
-           <span className="text-[20vw] font-serif uppercase italic leading-none whitespace-nowrap">Limited Edition</span>
+      {/* 2. Trust Bar */}
+      <section className="bg-white py-12 border-b border-warm/20">
+        <div className="max-w-[1800px] mx-auto px-6 md:px-12 grid grid-cols-2 md:grid-cols-4 gap-8">
+          {[
+            { icon: ShieldCheck, title: "BIS Hallmarked", sub: "100% Certified Purity" },
+            { icon: Truck, title: "Secure Shipping", sub: "Insured Global Delivery" },
+            { icon: RotateCcw, title: "15 Day Returns", sub: "Hassle-Free Exchange" },
+            { icon: Gem, title: "Lifetime Exchange", sub: "On All Jewelry Items" },
+          ].map((item, i) => (
+            <div key={i} className="flex flex-col items-center text-center group">
+              <item.icon size={24} strokeWidth={1} className="text-accent mb-4 group-hover:scale-110 transition-transform" />
+              <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] mb-1">{item.title}</h4>
+              <p className="text-[10px] text-gray-400 uppercase tracking-widest">{item.sub}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* 7. Newsletter Subscription */}
+      {/* 3. Jewelry Collections Grid */}
+      <FeaturedCategories />
+
+      {/* 4. Best Sellers / Most Coveted */}
+      <BestSellers />
+
+      {/* 5. Bridal Storytelling */}
+      <BridalCollection />
+
+      {/* 6. Social Proof / Influencer Gallery */}
+      <SocialProof />
+
+      {/* 7. Editorial Philosophy Banner */}
+      <LifestyleBanner />
+
+      {/* 8. Newsletter & Membership */}
       <Newsletter />
     </main>
   );

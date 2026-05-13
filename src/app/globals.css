@@ -1,22 +1,23 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-inter), system-ui, sans-serif;
-  --font-serif: var(--font-playfair), serif;
+  --font-sans: "Inter", var(--font-inter), system-ui, sans-serif;
+  --font-serif: "Playfair Display", var(--font-playfair), serif;
   --font-mono: var(--font-geist-mono), monospace;
 
   --color-primary: #111111;
-  --color-secondary: #F5F1EB;
-  --color-accent: #C8A97E;
+  --color-secondary: #FAF7F2;
+  --color-accent: #D4AF7F;
+  --color-warm: #E8DCCB;
   --color-text-main: #222222;
-  --color-bg-main: #FFFFFF;
+  --color-bg-main: #FAF7F2;
   
   --radius-none: 0;
   --radius-sm: 2px;
   --radius-md: 4px;
   --radius-lg: 8px;
   
-  --transition-smooth: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  --transition-smooth: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 *,
@@ -37,6 +38,22 @@ body {
   overflow-x: hidden;
   background-color: var(--color-bg-main);
   color: var(--color-text-main);
+}
+
+/* Luxury Shimmer Effect */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer-gold {
+  background: linear-gradient(90deg, 
+    rgba(212, 175, 127, 0) 0%, 
+    rgba(212, 175, 127, 0.2) 50%, 
+    rgba(212, 175, 127, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
 }
 
 a {
