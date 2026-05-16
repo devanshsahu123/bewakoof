@@ -2,9 +2,9 @@ import axiosInstance from "@/lib/axiosInstance";
 import type { LoginResponse, User } from "@/types";
 
 export const authService = {
-    async login(email: string, password: string): Promise<LoginResponse> {
-        const { data } = await axiosInstance.post<LoginResponse>("/auth/login", {
-            email,
+    async login(identifier: string, password: string): Promise<LoginResponse> {
+        const { data } = await axiosInstance.post<LoginResponse>("/customer/auth/login", {
+            identifier,
             password,
         });
         if (data.token) {
@@ -15,14 +15,10 @@ export const authService = {
 
     async logout(): Promise<void> {
         try {
-            await axiosInstance.post("/auth/logout");
+            await axiosInstance.post("/customer/auth/logout");
         } finally {
             localStorage.removeItem("web_token");
         }
     },
 
-    async getMe(): Promise<User> {
-        const { data } = await axiosInstance.get<User>("/auth/me");
-        return data;
-    },
 };
